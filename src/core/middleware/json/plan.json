@@ -1,0 +1,121 @@
+{
+  "features": {
+    "facturacion": ["Plan Basico", "Plan Profesional", "Plan Premium"],
+    "inventario_basico": ["Plan Profesional", "Plan Premium"],
+    "inventario_avanzado": ["Plan Premium"],
+    "multiempresa": ["Plan Premium"]
+  },
+  "planes": [
+    {
+      "nombre": "Plan Básico",
+      "precio_cop_mensual": 29000,
+      "incluye": [
+        {
+          "titulo": "Facturación electrónica estándar",
+          "descripcion": "Genera facturas con todos los campos requeridos y produce los archivos XML y PDF."
+        },
+        {
+          "titulo": "Gestión de clientes, productos y proveedores",
+          "descripcion": "Permite crear, editar y consultar clientes, productos y proveedores simples."
+        },
+        {
+          "titulo": "Almacenamiento de documentos (básico)",
+          "descripcion": "Guarda un volumen limitado de facturas en el sistema."
+        },
+        {
+          "titulo": "1 usuario y 1 empresa",
+          "descripcion": "Acceso único para un negocio pequeño sin multiusuario."
+        },
+        {
+          "titulo": "Soporte por chat básico",
+          "descripcion": "Atención para dudas operativas simples."
+        }
+      ]
+    },
+    {
+      "nombre": "Plan Profesional",
+      "precio_cop_mensual": 59000,
+      "incluye": [
+        {
+          "titulo": "Todo lo del Plan Básico",
+          "descripcion": "Conserva todas las funciones ya mencionadas."
+        },
+        {
+          "titulo": "Notas crédito y notas débito",
+          "descripcion": "Permite corregir o ajustar valores de facturas emitidas."
+        },
+        {
+          "titulo": "Inventario básico",
+          "descripcion": "Controla existencias, entradas y salidas sin funciones avanzadas."
+        },
+        {
+          "titulo": "Reportes de ventas generales",
+          "descripcion": "Muestra resúmenes de ventas por fechas, cliente o producto."
+        },
+        {
+          "titulo": "Multiusuario",
+          "descripcion": "Permite varios usuarios con permisos simples."
+        },
+        {
+          "titulo": "API de consulta",
+          "descripcion": "Permite obtener información de facturas desde aplicaciones externas."
+        },
+        {
+          "titulo": "Mayor capacidad de almacenamiento",
+          "descripcion": "Guarda más documentos que el plan básico."
+        },
+        {
+          "titulo": "Soporte estándar",
+          "descripcion": "Respuestas más rápidas y con ayuda técnica básica."
+        }
+      ]
+    },
+    {
+      "nombre": "Plan Premium",
+      "precio_cop_mensual": 119000,
+      "incluye": [
+        {
+          "titulo": "Todo lo del Plan Profesional",
+          "descripcion": "Mantiene todas las funciones previas."
+        },
+        {
+          "titulo": "Inventario avanzado",
+          "descripcion": "Manejo de costos, kardex, alertas de stock y bodegas múltiples."
+        },
+        {
+          "titulo": "Cartera y registro de pagos",
+          "descripcion": "Control de cuentas por cobrar, vencimientos y abonos."
+        },
+        {
+          "titulo": "Multiempresa",
+          "descripcion": "Maneja varias empresas desde un mismo panel."
+        },
+        {
+          "titulo": "API completa (crear y consultar)",
+          "descripcion": "Permite integrar sistemas externos para generar y consultar documentos."
+        },
+        {
+          "titulo": "Roles y permisos avanzados",
+          "descripcion": "Control granular sobre acciones permitidas para cada usuario."
+        },
+        {
+          "titulo": "Almacenamiento ampliado",
+          "descripcion": "Mayor capacidad para históricos y documentos anexos."
+        },
+        {
+          "titulo": "Plantillas personalizadas",
+          "descripcion": "Permite personalizar el diseño del PDF con logotipo, colores y estructura."
+        },
+        {
+          "titulo": "Soporte prioritario",
+          "descripcion": "Atención más rápida y resolución técnica avanzada."
+        }
+      ]
+    },
+    {
+      "nombre": "Plan Personalizado",
+      "precio_cop_mensual": null,
+      "descripcion": "Depende de los requerimientos específicos del usuario."
+    }
+  ]
+}
