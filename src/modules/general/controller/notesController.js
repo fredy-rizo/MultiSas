@@ -6,9 +6,8 @@ import { Production } from "../../sublimacion/models/Production.js";
 import { Client } from "../../sublimacion/models/Client.js";
 import { Sale } from "../../sublimacion/models/Sale.js";
 import { CreditNote } from "../models/CreditNote.js";
-import { DebitNote } from "../models/debitNote.js";
+import { DebitNote } from "../models/DebitNote.js"
 import { Company } from "../models/Company.js";
-
 /**
  * @param {import('express').Request} req
  * @param {import('express').Response} res

@@ -13,18 +13,42 @@ export const check_plan_expiration = async (req, res, next) => {
         .status(404)
         .json({ msj: "Usuario no encontrado", status: false });
 
-    if (!user.expired_available_plans) {
-      req.user.day_available_plans = 0;
+    const raw = user.expired_available_plans;
+
+    if (!raw) {
+      req.user.available_plans = "";
+      return next();
+    }
+
+    const parts = raw.split("/");
+    if (parts.length !== 3) {
+      req.user.day_available_plans = "";
+      return next();
+    }
+
+    let [day, month, year] = parts;
+
+    day = Number(day);
+    month = Number(month);
+    year = year.length === 2 ? Number("20" + year) : Number(year);
+
+    const expired = new Date(year, month - 1, day);
+
+    if (
+      isNaN(expired.getTime()) ||
+      expired.getDate() !== day ||
+      expired.getMonth() !== month - 1 ||
+      expired.getFullYear() !== year
+    ) {
+      req.user.day_available_plans = "";
       return next();
     }
 
     const today = new Date();
-    const expired = new Date(user.expired_available_plans);
-
     const diff = expired - today;
-    const days_left = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    const days_lef = Math.ceil(diff / (1000 * 60 * 60 * 24));
 
-    if (days_left <= 0) {
+    if (days_lef <= 0) {
       await Company.updateOne(
         { _id: user._id },
         {
@@ -42,7 +66,7 @@ export const check_plan_expiration = async (req, res, next) => {
       return next();
     }
 
-    req.user.day_available_plans = days_left;
+    req.user.day_available_plans = days_lef;
     next();
   } catch (err) {
     console.log(err);

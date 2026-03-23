@@ -315,6 +315,36 @@ export const create_user_company_by_admin = async (req, res) => {
  * @param {import('express').Response} res
  */
 
+export const active_account_by_company = async (req, res) => {
+  try {
+    const { user_company_id } = req.params;
+    const { active } = req.body;
+
+    let data_user_company = await UserCompany.findById(user_company_id);
+    if (!data_user_company)
+      return res
+        .status(404)
+        .json({ msj: "Usuario no encontrado en empresa", status: false });
+
+    const result = await UserCompany.updateOne(
+      { _id: user_company_id },
+      { $set: { active } },
+    );
+
+    res
+      .status(200)
+      .json({ msj: "Cuenta activada correctamente", status: true, result });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+};
+
+/**
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+
 export const login_user_by_company = async (req, res) => {
   try {
     const { nit_company_by_user, password_user_company } = req.body;
@@ -410,38 +440,17 @@ export const login_user_by_company = async (req, res) => {
  * @param {import('express').Response} res
  */
 
-export const active_account_by_company = async (req, res) => {
-  try {
-    const { user_company_id } = req.params;
-    const { active } = req.body;
-
-    let data_user_company = await UserCompany.findById(user_company_id);
-    if (!data_user_company)
-      return res
-        .status(404)
-        .json({ msj: "Usuario no encontrado en empresa", status: false });
-
-    const result = await UserCompany.updateOne(
-      { _id: user_company_id },
-      { $set: { active } },
-    );
-
-    res
-      .status(200)
-      .json({ msj: "Cuenta activada correctamente", status: true, result });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
-  }
-};
-
-/**
- * @param {import('express').Request} req
- * @param {import('express').Response} res
- */
-
 export const test_plan_axpiration = async (req, res) => {
   try {
+    // const data = {
+    //   status: true,
+    //   day_lef: req.user.day_available_plans,
+    //   user_id: req.user.id,
+    // };
+
+    // console.log("data", data);
+    // return;
+
     return res.json({
       status: true,
       day_lef: req.user.day_available_plans,

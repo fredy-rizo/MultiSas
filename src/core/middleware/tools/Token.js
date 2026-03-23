@@ -7,6 +7,7 @@ import plan from "../json/plan.json" with { type: "json" };
 export const Token = async (req, res, next) => {
   const authHeader = req.headers["token-access"];
   const token = authHeader?.split(" ")[1];
+  // console.log("Token desde middleware", token);
 
   if (!token)
     return res.status(401).json({ msj: "Sin autorizacion", status: false });
@@ -84,10 +85,12 @@ export const TokenUserCompany = async (req, res, next) => {
 
 export const TokenAny = async (req, res, next) => {
   const authHeader = req.headers["token-access"];
+  // console.log("authHeaderrrr", authHeader);
   const token = authHeader?.split(" ")[1];
-
+  // console.log("token desde tokenAny middleware", token);
+  // return;
   if (!token)
-    return res.status(401).json({ msj: "Sin autorizacion", status: false });
+    return res.status(401).json({ msj: "Sin autorizacionS", status: false });
 
   try {
     const decoded = jwt.verify(token, config.SECRET);
