@@ -10,6 +10,7 @@ const pedidoSchema = new Schema(
     type_pedido: String,
     quantity_pedido: String,
     price_pedido: String,
+    moneda: { type: String, default: "COP" },
     company: {
       _id: String,
       name_company: String,

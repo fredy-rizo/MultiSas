@@ -11,7 +11,8 @@ import { Client } from "../models/Client.js";
 
 export const create_pedido = async (req, res) => {
   try {
-    const { company_id, client_id, user_company_id } = req.params;
+    // const { company_id, client_id, user_company_id } = req.params;
+    const { company_id, client_id } = req.params;
     const { description_pedido, type_pedido, quantity_pedido, price_pedido } =
       req.body;
 
@@ -27,13 +28,13 @@ export const create_pedido = async (req, res) => {
         .status(404)
         .json({ msj: "Cliente no encontrado", status: false });
 
-    const userCompanyX = await Company.findOne({
-      "user_company_sublimacion._id": user_company_id,
-    });
-    if (!userCompanyX)
-      return res
-        .status(404)
-        .json({ msj: "Usuario de empresa no encontrado", status: false });
+    // const userCompanyX = await Company.findOne({
+    //   "user_company_sublimacion._id": user_company_id,
+    // });
+    // if (!userCompanyX)
+    //   return res
+    //     .status(404)
+    //     .json({ msj: "Usuario de empresa no encontrado", status: false });
 
     if (
       !description_pedido ||

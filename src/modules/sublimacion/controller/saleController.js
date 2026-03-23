@@ -46,7 +46,7 @@ export const create_sale = async (req, res) => {
         .json({ msj: "Produccion no encontrada", status: false });
 
     const bill_number = await generate_bill_number(production_data.company._id);
-    const new_sale = await Sale.create({
+    const new_sale = new Sale({
       bill_number,
       client: {
         _id: client_data._id.toString(),
@@ -63,46 +63,57 @@ export const create_sale = async (req, res) => {
         priority_production: production_data.priority_production,
         production_finalized_date: production_data.production_finalized_date,
       },
+      company: {
+        _id: data_company._id.toString(),
+        name_company: data_company.name_company,
+        name_founder: data_company.name_founder,
+        nit_company: data_company.nit_company,
+        available_plans: data_company.available_plans,
+        months_quantity: data_company.months_quantity,
+        expired_available_plans: data_company.expired_available_plans,
+      },
       payment_method,
       quantity: Number(quantity),
-      price,
-      sub_total,
-      total,
+      price: production_data.price_production,
+      sub_total: production_data.price_production,
+      total: production_data.price_production,
     });
 
-    await Company.updateOne(
-      { _id: data_company._id },
-      {
-        $push: {
-          sale_company_sublimacion: {
-            _id: new_sale._id.toString(),
-            bill_number,
-            client: {
-              _id: client_data._id.toString(),
-              name_client: client_data.name_client,
-            },
-            production: {
-              _id: production_data._id.toString(),
-              bill_number: production_data.bill_counter,
-              price_production: production_data.price_production,
-              type_production: production_data.type_production,
-              quantity_production: production_data.quantity_production,
-              delivery_date_production:
-                production_data.delivery_date_production,
-              responsible_production: production_data.responsible_production,
-              priority_production: production_data.priority_production,
-              production_finalized_date:
-                production_data.production_finalized_date,
-            },
-            payment_method,
-            quantity: Number(quantity),
-            price,
-            sub_total,
-            total,
-          },
-        },
-      },
-    );
+    const save_sale = await new_sale.save();
+
+    // await Company.updateOne(
+    //   { _id: data_company._id },
+    //   {
+    //     $push: {
+    //       sale_company_sublimacion: {
+    //         _id: new_sale._id.toString(),
+    //         bill_number,
+    //         client: {
+    //           _id: client_data._id.toString(),
+    //           name_client: client_data.name_client,
+    //         },
+    //         production: {
+    //           _id: production_data._id.toString(),
+    //           bill_number: production_data.bill_counter,
+    //           price_production: production_data.price_production,
+    //           type_production: production_data.type_production,
+    //           quantity_production: production_data.quantity_production,
+    //           delivery_date_production:
+    //             production_data.delivery_date_production,
+    //           responsible_production: production_data.responsible_production,
+    //           priority_production: production_data.priority_production,
+    //           production_finalized_date:
+    //             production_data.production_finalized_date,
+    //         },
+    //         payment_method,
+    //         quantity: Number(quantity),
+    //         price,
+    //         sub_total,
+    //         total,
+    //       },
+    //     },
+    //   },
+    // );
 
     // Crear asiento contable
     // const today = new Date();
@@ -167,7 +178,7 @@ export const create_sale = async (req, res) => {
 
     res
       .status(200)
-      .json({ msj: "Venta realizada correctamente", status: true, new_sale });
+      .json({ msj: "Venta realizada correctamente", status: true, save_sale });
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
@@ -190,7 +201,9 @@ export const list_sale = async (req, res) => {
         .json({ msj: "Empresa no encontrada", status: false });
 
     const filter = { "company._id": company_id };
+    // console.log("filter", filter);
     const cant = await Sale.countDocuments(filter);
+    // console.log("cant", cant);
 
     const data = await Sale.find(filter)
       .skip(req.body.skippag)
@@ -234,12 +247,12 @@ export const list_sale_company_id = async (req, res) => {
         .status(404)
         .json({ msj: "Venta no encontrada", status: false });
 
-    const is_admin =
-      req.user.role_user === "Admin" || req.user.role_user === "Super Admin";
-    if (!is_admin)
-      return res
-        .status(403)
-        .json({ msj: "No tienes permisos para esta funcion", status: false });
+    // const is_admin =
+    //   req.user.role_user === "Admin" || req.user.role_user === "Super Admin";
+    // if (!is_admin)
+    //   return res
+    //     .status(403)
+    //     .json({ msj: "No tienes permisos para esta funcion", status: false });
 
     const info_company_sale = await Sale.findOne({
       _id: sale_id,

@@ -15,7 +15,8 @@ import {
 const router = Router();
 
 router.post(
-  "/:company_id/:client_id/:user_company_id",
+  // "/:company_id/:client_id/:user_company_id",
+  "/:company_id/:client_id",
   // TokenUserCompany,
   // Token,
   TokenAny,

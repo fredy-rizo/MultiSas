@@ -63,24 +63,24 @@ export const create_supplier_company = async (req, res) => {
       city_supplier,
     });
 
-    await Company.updateOne(
-      { _id: data_company._id },
-      {
-        $push: {
-          supplier_company_sublimacion: {
-            _id: new_create_supplier._id.toString(),
-            document_type_supplier,
-            number_document_supplier,
-            company_name,
-            contact_name,
-            email_supplier,
-            phone_supplier,
-            address_supplier,
-            city_supplier,
-          },
-        },
-      },
-    );
+    // await Company.updateOne(
+    //   { _id: data_company._id },
+    //   {
+    //     $push: {
+    //       supplier_company_sublimacion: {
+    //         _id: new_create_supplier._id.toString(),
+    //         document_type_supplier,
+    //         number_document_supplier,
+    //         company_name,
+    //         contact_name,
+    //         email_supplier,
+    //         phone_supplier,
+    //         address_supplier,
+    //         city_supplier,
+    //       },
+    //     },
+    //   },
+    // );
 
     res.status(200).json({
       msj: "Nuevo proveedor creado exitosamente",
@@ -101,6 +101,18 @@ export const update_supplier_company = async (req, res) => {
   try {
     const { company_id, supplier_id } = req.params;
 
+    const company_data = await Company.findById(company_id);
+    if (!company_data)
+      return res
+        .status(404)
+        .json({ msj: "Empresa no encontrada", status: false });
+
+    const supplier_data = await Supplier.findById(supplier_id);
+    if (!supplier_data)
+      return res
+        .status(404)
+        .json({ msj: "Proovedor no encontrado", status: false });
+
     const updating_data = {
       document_type_supplier: req.body.document_type_supplier,
       number_document_supplier: req.body.number_document_supplier,
@@ -112,39 +124,42 @@ export const update_supplier_company = async (req, res) => {
       city_supplier: req.body.city_supplier,
     };
 
-    const [supplier_data_result, company_data_result] = await Promise.all([
-      Supplier.updateOne({ _id: supplier_id }, { $set: updating_data }),
+    const resp = await Supplier.updateOne(
+      { _id: supplier_id },
+      { $set: updating_data },
+    );
+    // const [supplier_data_result, company_data_result] = await Promise.all([
 
-      Company.updateOne(
-        {
-          _id: company_id,
-          "supplier_company_sublimacion._id": supplier_id,
-        },
-        {
-          $set: {
-            "supplier_company_sublimacion.$": {
-              _id: supplier_id,
-              ...updating_data,
-            },
-          },
-        },
-      ),
-    ]);
+    // Company.updateOne(
+    //   {
+    //     _id: company_id,
+    //     "supplier_company_sublimacion._id": supplier_id,
+    //   },
+    //   {
+    //     $set: {
+    //       "supplier_company_sublimacion.$": {
+    //         _id: supplier_id,
+    //         ...updating_data,
+    //       },
+    //     },
+    //   },
+    // ),
+    // ]);
 
-    if (supplier_data_result.matchedCount === 0)
-      return res
-        .status(404)
-        .json({ msj: "Proveedor no encontrado", status: false });
+    // if (supplier_data_result.matchedCount === 0)
+    //   return res
+    //     .status(404)
+    //     .json({ msj: "Proveedor no encontrado", status: false });
 
-    if (company_data_result.matchedCount === 0)
-      return res.status(404).json({
-        msj: "Proveedor no encontrado dentro de la empresa",
-        status: false,
-      });
+    // if (company_data_result.matchedCount === 0)
+    //   return res.status(404).json({
+    //     msj: "Proveedor no encontrado dentro de la empresa",
+    //     status: false,
+    //   });
 
     res
       .status(200)
-      .json({ msj: "Proveedor actualizado correctamente", status: true });
+      .json({ msj: "Proveedor actualizado correctamente", status: true, resp });
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
@@ -199,11 +214,11 @@ export const delete_supplier_company = async (req, res) => {
   try {
     const { supplier_id } = req.params;
 
-    const is_admin = req.user.role_user === "Admin";
-    if (!is_admin)
-      return res
-        .status(403)
-        .json({ msj: "No tienes permisos para esta funcion", status: false });
+    // const is_admin = req.user.role_user === "Admin";
+    // if (!is_admin)
+    //   return res
+    //     .status(403)
+    //     .json({ msj: "No tienes permisos para esta funcion", status: false });
 
     let supplier_data = await Supplier.findById(supplier_id);
     if (!supplier_data)
@@ -213,14 +228,14 @@ export const delete_supplier_company = async (req, res) => {
 
     await Promise.all([
       Supplier.deleteOne({ _id: supplier_id }),
-      Company.updateOne(
-        { _id: new mongoose.Types.ObjectId(supplier_data.company._id) },
-        {
-          $pull: {
-            supplier_company_sublimacion: { _id: supplier_id.toString() },
-          },
-        },
-      ),
+      // Company.updateOne(
+      //   { _id: new mongoose.Types.ObjectId(supplier_data.company._id) },
+      //   {
+      //     $pull: {
+      //       supplier_company_sublimacion: { _id: supplier_id.toString() },
+      //     },
+      //   },
+      // ),
     ]);
 
     res

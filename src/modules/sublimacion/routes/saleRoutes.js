@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { create_sale, list_sale } from "../controller/saleController.js";
+import {
+  create_sale,
+  list_sale,
+  list_sale_company_id,
+} from "../controller/saleController.js";
 import {
   Token,
   TokenAny,
@@ -24,5 +28,12 @@ router.get(
   Paginate,
   list_sale,
 ); // Listar ventas
+
+router.get(
+  "/list/:company_id/unique/:sale_id",
+  TokenAny,
+  TokenAuthorize("Admin", "Super Admin"),
+  list_sale_company_id,
+); // Listar ventas por ID
 
 export default router;
