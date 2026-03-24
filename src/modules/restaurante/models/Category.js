@@ -6,7 +6,14 @@ const categorySchema = new Schema(
     name_category: String,
     description_category: String,
     sort_order: String,
-    status_category: { type: Boolean, default: false },
+    status_category: { type: Boolean, default: true },
+    company: {
+      _id: String,
+      name_company: String,
+      name_founder: String,
+      nit_company: String,
+      type_dato: String,
+    },
   },
   { timestamps: true },
 );

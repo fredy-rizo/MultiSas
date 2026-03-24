@@ -187,14 +187,14 @@ export const delete_client_company = async (req, res) => {
 
     await Promise.all([
       Client.deleteOne({ _id: client_id }),
-      Company.updateOne(
-        { _id: new mongoose.Types.ObjectId(client_data.company._id) },
-        {
-          $pull: {
-            client_company_sublimacion: { _id: client_id.toString() },
-          },
-        },
-      ),
+      // Company.updateOne(
+      //   { _id: new mongoose.Types.ObjectId(client_data.company._id) },
+      //   {
+      //     $pull: {
+      //       client_company_sublimacion: { _id: client_id.toString() },
+      //     },
+      //   },
+      // ),
     ]);
 
     res

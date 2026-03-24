@@ -20,6 +20,9 @@ import Sale from "./modules/sublimacion/routes/saleRoutes.js";
 import Pedido from "./modules/sublimacion/routes/pedidoRoutes.js";
 import Production from "./modules/sublimacion/routes/productionRoutes.js";
 
+// TODO → Restaurante
+import Category from "./modules/restaurante/routes/categoryRoutes.js";
+
 const app = express();
 console.log(config);
 
@@ -48,10 +51,7 @@ app.use("/api/sale", Sale);
 app.use("/api/pedido", Pedido);
 app.use("/api/production", Production);
 
-export default app;
+// TODO → Restaurante
+app.use("/api/category", Category);
 
-/*
-  1. Productos no tendria relacion para empresa de sublimacion.
-  2. Inventario no tendria relacion para empresa de sublimacion.
-  3. Compras no tendria relacion para empresa de sublimacion
-*/
+export default app;
