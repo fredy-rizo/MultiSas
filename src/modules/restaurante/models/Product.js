@@ -21,9 +21,14 @@ const productSchema = new Schema(
     description_product: String,
     price_product: String,
     status_product: { type: Boolean, default: true },
-    available: { type: Boolean, default: true },
-    variants: [String],
-    extras: [String],
+    // available: { type: Boolean, default: true },
+    // variants: [String],
+    extras: [
+      {
+        name_extra: String,
+        price_extra: String,
+      },
+    ],
   },
   { timestamps: true },
 );
