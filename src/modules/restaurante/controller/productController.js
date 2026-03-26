@@ -273,3 +273,37 @@ export const delete_extra_product = async (req, res) => {
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  */
+
+export const list_products = async (req, res) => {
+  try {
+    const { company_id } = req.params;
+
+    const company_data = await Company.findById(company_id);
+    if (!company_data)
+      return res
+        .status(404)
+        .json({ msj: "Empresa no encontrada", status: false });
+
+    const filter = { "company._id": company_id };
+    const cant = await Product.countDocuments(filter);
+
+    const data = await Product.find(filter)
+      .skip(req.body.skippag)
+      .limit(req.body.limit)
+      .sort({ _id: -1 });
+
+    res.status(200).json({
+      msj: "Cargando productos",
+      status: false,
+      data,
+      pagination: {
+        pag: req.params.pag,
+        perpage: req.body.limit,
+        pags: Math.ceil(cant / req.body.limit),
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+};

@@ -8,6 +8,7 @@ import {
   create_product,
   delete_extra_product,
   delete_product,
+  list_products,
   push_extra_product,
   update_product,
   update_product_extra,
@@ -55,5 +56,13 @@ router.delete(
   TokenAuthorize("Admin", "Super Admin"),
   delete_extra_product,
 ); // Eliminar extras de producto (menu)
+
+router.get(
+  "/list/:company_id/product",
+  TokenAny,
+  TokenAuthorize("Admin", "Super Admin"),
+  Paginate,
+  list_products,
+); // Listar productos (menu)
 
 export default router;
