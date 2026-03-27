@@ -294,7 +294,7 @@ export const list_products = async (req, res) => {
 
     res.status(200).json({
       msj: "Cargando productos",
-      status: false,
+      status: true,
       data,
       pagination: {
         pag: req.params.pag,
