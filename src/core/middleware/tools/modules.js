@@ -8,4 +8,5 @@ export const modulesByType = {
     "ventas",
   ],
   hotel: ["reservas", "habitaciones", "clientes", "pagos"],
+  restaurante: ["productos", "categorias", "mesas", "reservas", "ventas"],
 };

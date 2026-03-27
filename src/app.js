@@ -23,6 +23,7 @@ import Production from "./modules/sublimacion/routes/productionRoutes.js";
 // TODO → Restaurante
 import Category from "./modules/restaurante/routes/categoryRoutes.js";
 import Product from "./modules/restaurante/routes/productRoutes.js";
+import Table from "./modules/restaurante/routes/tableRoutes.js";
 
 const app = express();
 console.log(config);
@@ -55,5 +56,6 @@ app.use("/api/production", Production);
 // TODO → Restaurante
 app.use("/api/category", Category);
 app.use("/api/product", Product);
+app.use("/api/table", Table);
 
 export default app;
