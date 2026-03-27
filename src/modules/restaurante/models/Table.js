@@ -8,6 +8,7 @@ const tableSchema = new Schema(
     occupied: { type: Boolean, default: false },
     reserved: { type: Boolean, default: false },
     hour_reserved: { type: String, default: "" },
+    observation_reserved: { type: String, default: "" },
     company: {
       _id: String,
       name_company: String,
@@ -25,6 +26,7 @@ const tableSchema = new Schema(
         occupied -> Saber si esta ocupada
         reserved -> Saber si esta reservada
         hour_reserved -> Saber la hora de la reserva
+        observation_reserved -> Observacion de la reserva
 */
 
 export const Table = mongoose.model("table_restaurante", tableSchema);

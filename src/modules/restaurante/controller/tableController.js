@@ -83,6 +83,86 @@ export const update_table = async (req, res) => {
  * @param {import('express').Response} res
  */
 
+export const update_occupied_table = async (req, res) => {
+  try {
+    const { company_id, table_id } = req.params;
+    const { occupied } = req.body;
+
+    const company_data = await Company.findById(company_id);
+    if (!company_data)
+      return res
+        .status(404)
+        .json({ msj: "Empresa no encontrada", status: false });
+
+    const table_data = await Table.findById(table_id);
+    if (!table_data)
+      return res.status(404).json({ msj: "Mesa no encontrada", status: false });
+
+    await Table.updateOne(
+      { _id: table_id },
+      {
+        $set: {
+          occupied,
+        },
+      },
+    );
+
+    res.status(200).json({
+      msj: "Estado de la mesa actualizado exitosamenete",
+      status: true,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+};
+
+/**
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+
+export const update_reserve_table = async (req, res) => {
+  try {
+    const { company_id, table_id } = req.params;
+    const { reserved, observation_reserved } = req.body;
+
+    const company_data = await Company.findById(company_id);
+    if (!company_data)
+      return res
+        .status(404)
+        .json({ msj: "Empresa no encontrada", status: false });
+
+    const table_data = await Table.findById(table_id);
+    if (!table_data)
+      return res.status(404).json({ msj: "Mesa no encontrada", status: false });
+
+    await Table.updateOne(
+      { _id: table_id },
+      {
+        $set: {
+          reserved,
+          hour_reserved: new Date().toLocaleDateString(),
+          observation_reserved,
+        },
+      },
+    );
+
+    res.status(200).json({
+      msj: "Reserva de la mesa actualizada correctamente",
+      status: true,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+};
+
+/**
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+
 export const delete_table = async (req, res) => {
   try {
     const { company_id, table_id } = req.params;

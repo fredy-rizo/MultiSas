@@ -8,6 +8,8 @@ import {
   create_table,
   delete_table,
   list_tables,
+  update_occupied_table,
+  update_reserve_table,
   update_table,
 } from "../controller/tableController.js";
 const router = Router();
@@ -25,6 +27,20 @@ router.put(
   TokenAuthorize("Admin", "Super Admin"),
   update_table,
 ); // Actualizar mesa del local en restaurante
+
+router.put(
+  "/updating-occupied/:company_id/:table_id",
+  TokenAny,
+  TokenAuthorize("Admin", "Super Admin"),
+  update_occupied_table,
+); // Actualizar estado de ocupado de la mesa en restaurante
+
+router.put(
+  "/updating-reserved/:company_id/:table_id",
+  TokenAny,
+  TokenAuthorize("Admin", "Super Admin"),
+  update_reserve_table,
+); // Actualizar reserva para mesa en restaurante
 
 router.delete(
   "/remove/:company_id/:table_id",
