@@ -26,6 +26,7 @@ import Product from "./modules/restaurante/routes/productRoutes.js";
 import Table from "./modules/restaurante/routes/tableRoutes.js";
 import Delivery from "./modules/restaurante/routes/deliveryRoutes.js";
 import PedidoRestaurante from "./modules/restaurante/routes/pedidoRoutes.js";
+import Charge from "./modules/restaurante/routes/chargeRoutes.js";
 
 const app = express();
 console.log(config);
@@ -61,5 +62,6 @@ app.use("/api/product", Product);
 app.use("/api/table", Table);
 app.use("/api/delivery", Delivery);
 app.use("/api/pedido", PedidoRestaurante);
+app.use("/api/charge", Charge);
 
 export default app;

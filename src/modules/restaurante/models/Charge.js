@@ -6,7 +6,7 @@ const chargeSchema = new Schema(
     product: {
       _id: String,
       name_product: String,
-      description: String,
+      description_product: String,
       price_product: String,
       extras: [
         {
@@ -27,6 +27,7 @@ const chargeSchema = new Schema(
       default: "",
     },
     paid: { type: Boolean, default: false },
+    price_charge: String,
   },
   { timestamps: true },
 );
