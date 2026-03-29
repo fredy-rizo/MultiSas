@@ -103,3 +103,19 @@ export const generate_bill_debit = async (company_id) => {
 
   return `DN-${data_number}`;
 };
+
+export const generate_bill_number_pedido_restaurante = async (company_id) => {
+  const company = await Company.findByIdAndUpdate(
+    company_id,
+    { $inc: { bill_counter_pedido_restaurante: 1 } },
+    { new: true },
+  );
+
+  if (!company) throw new Error("Empresa no encontrada");
+
+  const data_number = company.bill_counter_pedido_restaurante
+    .toString()
+    .padStart(3, "0");
+
+  return `PD-${data_number}`;
+};
