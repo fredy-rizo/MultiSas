@@ -9,4 +9,5 @@ export const modulesByType = {
   ],
   hotel: ["reservas", "habitaciones", "clientes", "pagos"],
   restaurante: ["productos", "categorias", "mesas", "reservas", "ventas"],
+  farmacia: ["productos", "clientes", "proveedores", "ventas"],
 };

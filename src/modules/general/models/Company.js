@@ -45,6 +45,8 @@ const companySchema = new Schema(
     bill_counter_credit: { type: Number, default: 0 },
     bill_counter_debit: { type: Number, default: 0 },
     bill_counter_pedido_restaurante: { type: Number, default: 0 },
+    bill_counter_pharmacy: { type: Number, default: 0 },
+    bill_counter_batch: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now() },
     updatedAt: { type: Date, default: Date.now() },
   },
@@ -156,6 +158,10 @@ const companySchema = new Schema(
     bill_counter_pedido → Contador para enumerar facturas en pedidos
 
     bill_counter_production → Contador para enumerar facturas en producciones
+
+    bill_counter_pharmacy → Contador para enumerar productos en farmacia
+
+    bill_counter_batch → Contador para enumerar lotes en farmacia
 
 */
 

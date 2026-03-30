@@ -119,3 +119,33 @@ export const generate_bill_number_pedido_restaurante = async (company_id) => {
 
   return `PD-${data_number}`;
 };
+
+export const generate_bill_number_phaymacy = async (company_id) => {
+  const company = await Company.findByIdAndUpdate(
+    company_id,
+    { $inc: { bill_counter_pharmacy: 1 } },
+    { new: true },
+  );
+
+  if (!company) throw new Error("Empresa no encontrada");
+
+  const data_number = company.bill_counter_pharmacy.toString().padStart(3, "0");
+
+  return `FAR-${data_number}`;
+};
+
+export const generate_bill_number_batch = async (company_id) => {
+  const company = await Company.findByIdAndUpdate(
+    company_id,
+    { $inc: { bill_counter_batch: 1 } },
+    { new: true },
+  );
+
+  if (!company) throw new Error("Empresa no encontrada");
+
+  const data_number = company.bill_counter_batch.toString().padStart(3, "0");
+
+  const year = new Date().getFullYear();
+
+  return `LOTE-${year}-${data_number}`;
+};

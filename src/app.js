@@ -28,6 +28,9 @@ import Delivery from "./modules/restaurante/routes/deliveryRoutes.js";
 import PedidoRestaurante from "./modules/restaurante/routes/pedidoRoutes.js";
 import Charge from "./modules/restaurante/routes/chargeRoutes.js";
 
+// TODO → Pharmacy
+import ProductPharmacy from "./modules/farmacia/routes/productRoutes.js";
+
 const app = express();
 console.log(config);
 
@@ -63,5 +66,8 @@ app.use("/api/table", Table);
 app.use("/api/delivery", Delivery);
 app.use("/api/pedido", PedidoRestaurante);
 app.use("/api/charge", Charge);
+
+// TODO → Pharmacy
+app.use("/api/product", ProductPharmacy);
 
 export default app;
