@@ -6,6 +6,8 @@ import {
 } from "../../../core/middleware/tools/Token.js";
 import {
   create_product,
+  list_products,
+  list_products_stocks_minimum,
   update_product,
 } from "../controller/productController.js";
 const router = Router();
@@ -23,5 +25,21 @@ router.put(
   TokenAuthorize("Admin", "Super Admin"),
   update_product,
 ); // Actualizar producto en farmacia
+
+router.get(
+  "/stock/:company_id/:pag?/:perpage?",
+  TokenAny,
+  TokenAuthorize("Admin", "Super Admin"),
+  Paginate,
+  list_products_stocks_minimum,
+); // Listar productos con stock menor o igual a minimum_stock
+
+router.get(
+  "/:company_id/:pag?/:perpage?",
+  TokenAny,
+  TokenAuthorize("Admin", "Super Admin"),
+  Paginate,
+  list_products,
+); // Listar productos de farmacia
 
 export default router;

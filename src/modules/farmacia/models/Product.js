@@ -23,10 +23,16 @@ const productSchema = new Schema(
       ],
       default: "",
     },
-    stock_product: String,
-    minimum_stock_product: String,
+    stock_product: Number,
+    minimum_stock_product: Number,
     batch_product: String,
     expiration_date_product: String,
+    company: {
+      _id: String,
+      name_company: String,
+      name_founder: String,
+      nit_company: String,
+    },
   },
   { timestamps: true },
 );

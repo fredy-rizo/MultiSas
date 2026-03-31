@@ -68,6 +68,6 @@ app.use("/api/pedido", PedidoRestaurante);
 app.use("/api/charge", Charge);
 
 // TODO → Pharmacy
-app.use("/api/product", ProductPharmacy);
+app.use("/api/product-pharmacy", ProductPharmacy);
 
 export default app;
