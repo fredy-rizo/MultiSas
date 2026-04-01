@@ -21,6 +21,7 @@ export const create_product = async (req, res) => {
       unit_product,
       stock_product,
       minimum_stock_product,
+      batch_product,
       expiration_date_product,
     } = req.body;
 
@@ -32,6 +33,7 @@ export const create_product = async (req, res) => {
       !unit_product ||
       !stock_product ||
       !minimum_stock_product ||
+      !batch_product ||
       !expiration_date_product
     )
       return res
@@ -46,7 +48,7 @@ export const create_product = async (req, res) => {
 
     const bill_counter_pharmacy =
       await generate_bill_number_phaymacy(company_id);
-    const bill_counter_batch = await generate_bill_number_batch(company_id);
+    // const bill_counter_batch = await generate_bill_number_batch(company_id);
 
     const new_product_pharmacy = new Product({
       bill_counter: bill_counter_pharmacy,
@@ -57,14 +59,9 @@ export const create_product = async (req, res) => {
       unit_product,
       stock_product,
       minimum_stock_product,
-      batch_product: bill_counter_batch,
+      batch_product,
       expiration_date_product,
-      company: {
-        _id: company_data._id.toString(),
-        name_company: company_data.name_company,
-        name_founder: company_data.name_founder,
-        nit_company: company_data.nit_company,
-      },
+      company: company_data._id,
     });
 
     const save_product_pharmacy = await new_product_pharmacy.save();
