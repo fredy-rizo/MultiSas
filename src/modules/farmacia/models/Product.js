@@ -25,8 +25,14 @@ const productSchema = new Schema(
     },
     stock_product: Number,
     minimum_stock_product: Number,
-    batch_product: String,
-    expiration_date_product: String,
+    batch_product: [
+      {
+        lote: String,
+        expiration_date: Date,
+        quantity: Number,
+      },
+    ],
+    // expiration_date_product: String,
     company: String,
   },
   { timestamps: true },
@@ -42,7 +48,7 @@ const productSchema = new Schema(
     stock_product -> Cantidad maxima de compra de producto en farmacia
     minimum_stock_product -> Cantidad minima de producto en farmacia
     batch_product -> Lote de producto
-    expiration_date_product -> Fecha de vencimiento de producto DD/MM/AA
+    // expiration_date_product -> Fecha de vencimiento de producto DD/MM/AA
 */
 
 export const Product = mongoose.model("product_pharmacy", productSchema);
