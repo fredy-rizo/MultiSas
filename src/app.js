@@ -30,6 +30,7 @@ import Charge from "./modules/restaurante/routes/chargeRoutes.js";
 
 // TODO → Pharmacy
 import ProductPharmacy from "./modules/farmacia/routes/productRoutes.js";
+import ClientPharmacy from "./modules/farmacia/routes/clientRoutes.js";
 
 const app = express();
 console.log(config);
@@ -69,5 +70,6 @@ app.use("/api/charge", Charge);
 
 // TODO → Pharmacy
 app.use("/api/product-pharmacy", ProductPharmacy);
+app.use("/api/client-pharmacy", ClientPharmacy);
 
 export default app;
