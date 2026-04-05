@@ -46,6 +46,7 @@ const companySchema = new Schema(
     bill_counter_debit: { type: Number, default: 0 },
     bill_counter_pedido_restaurante: { type: Number, default: 0 },
     bill_counter_pharmacy: { type: Number, default: 0 },
+    bill_counter_sale_pharmacy: { type: Number, default: 0 },
     bill_counter_batch: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now() },
     updatedAt: { type: Date, default: Date.now() },

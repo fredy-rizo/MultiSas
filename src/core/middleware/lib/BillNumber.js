@@ -149,3 +149,19 @@ export const generate_bill_number_batch = async (company_id) => {
 
   return `LOTE-${year}-${data_number}`;
 };
+
+export const generate_bill_number_sale_pharmacy = async (company_id) => {
+  const company = await Company.findByIdAndUpdate(
+    company_id,
+    { $inc: { bill_counter_sale_pharmacy: 1 } },
+    { new: true },
+  );
+
+  if (!company) throw new Error("Empresa no encontrada");
+
+  const data_number = company.bill_counter_sale_pharmacy
+    .toString()
+    .padStart(3, "0");
+
+  return `FAC-${data_number}`;
+};
