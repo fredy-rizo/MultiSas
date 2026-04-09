@@ -26,7 +26,7 @@ router.post("/register-company", register_company); // Crear empresa (Super Admi
 
 router.post("/login-company", login_company); // Iniciar sesion (Admin de empresa)
 
-router.post(
+router.put(
   "/update-company/:company_id",
   // Token,
   TokenAny,

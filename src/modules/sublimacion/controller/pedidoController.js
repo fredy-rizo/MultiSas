@@ -16,6 +16,21 @@ export const create_pedido = async (req, res) => {
     const { description_pedido, type_pedido, quantity_pedido, price_pedido } =
       req.body;
 
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
+
     const companyX = await Company.findById(company_id);
     if (!companyX)
       return res
@@ -58,21 +73,10 @@ export const create_pedido = async (req, res) => {
       quantity_pedido,
       price_pedido,
       state_pedido: "Pendiente",
-      company: {
-        _id: companyX._id,
-        name_company: companyX.name_company,
-        name_founder: companyX.name_founder,
-        nit_company: companyX.nit_company,
-        available_plans: companyX.available_plans,
-        months_quantity: companyX.months_quantity,
-        expired_available_plans: companyX.expired_available_plans,
-      },
+      company: company_id,
       client: {
-        _id: clientX._id,
-        document_type_client: clientX.document_type_client,
-        number_document_client: clientX.number_document_client,
+        _id: clientX._id.toString(),
         name_client: clientX.name_client,
-        email_client: clientX.email_client,
         phone_client: clientX.phone_client,
       },
     });
@@ -117,6 +121,21 @@ export const update_pedido_state = async (req, res) => {
     const { company_id, pedido_id } = req.params;
     const { state_pedido } = req.body;
 
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
+
     const companyX = await Company.findById(company_id);
     if (!companyX)
       return res
@@ -129,25 +148,25 @@ export const update_pedido_state = async (req, res) => {
         .status(404)
         .json({ msj: "Pedido no encontrado", status: false });
 
-    const [pedido_updated] = await Promise.all([
-      Pedido.updateOne({ _id: pedido_id }, { $set: { state_pedido } }),
-      // Company.updateOne(
-      //   {
-      //     _id: company_id,
-      //     "pedido_company_sublimacion._id": pedido_id,
-      //   },
-      //   {
-      //     $set: {
-      //       "pedido_company_sublimacion.$.state_pedido": state_pedido,
-      //     },
-      //   },
-      // ),
-    ]);
+    await Pedido.updateOne({ _id: pedido_id }, { $set: { state_pedido } });
+    // const [pedido_updated] = await Promise.all([
+    // Company.updateOne(
+    //   {
+    //     _id: company_id,
+    //     "pedido_company_sublimacion._id": pedido_id,
+    //   },
+    //   {
+    //     $set: {
+    //       "pedido_company_sublimacion.$.state_pedido": state_pedido,
+    //     },
+    //   },
+    // ),
+    // ]);
 
-    if (pedido_updated.matchedCount === 0)
-      return res
-        .status(404)
-        .json({ msj: "Pedido no encontrado", status: false });
+    // if (pedido_updated.matchedCount === 0)
+    //   return res
+    //     .status(404)
+    //     .json({ msj: "Pedido no encontrado", status: false });
 
     // if (company_pedido_updated.matchedCount === 0)
     //   return res
@@ -173,6 +192,21 @@ export const list_pedidos = async (req, res) => {
   try {
     const { company_id, pedido_id, query } = req.params;
     const filter = Number(query);
+
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
 
     const companyX = await Company.findById(company_id).lean();
     if (!companyX)
@@ -225,6 +259,21 @@ export const list_pedidos = async (req, res) => {
 export const list_pedido = async (req, res) => {
   try {
     const { company_id, pedido_id } = req.params;
+
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
 
     const companyX = await Company.findOne(
       { _id: company_id },

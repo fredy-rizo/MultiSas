@@ -16,6 +16,10 @@ const productionSchema = new Schema(
     },
     finalized_production: { type: String, default: "" },
     production_finalized_date: { type: String, default: "" },
+    userCompany: {
+      _id: String,
+      name_user_company: String,
+    },
     company: {
       _id: String,
       name_company: String,
@@ -24,10 +28,7 @@ const productionSchema = new Schema(
     },
     client: {
       _id: String,
-      document_type_client: String,
-      number_document_client: String,
       name_client: String,
-      email_client: String,
       phone_client: String,
     },
     pedido: {

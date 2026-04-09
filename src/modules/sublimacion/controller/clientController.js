@@ -18,6 +18,29 @@ export const create_client_company = async (req, res) => {
       phone_client,
     } = req.body;
 
+    // if (req.user.type_dato === "company" || req.user.role === "Super Admin") {
+    //   if (req.user.id !== company_id)
+    //     return res.status(403).json({
+    //       msj: "No puedes acceder a esta funcion 'CTRL'",
+    //       status: false,
+    //     });
+    // }
+
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
+
     const data_company = await Company.findById(company_id);
     if (!data_company)
       return res
@@ -25,16 +48,17 @@ export const create_client_company = async (req, res) => {
         .json({ msj: "Empresa no encontrada", status: false });
 
     const new_create_client = await Client.create({
-      company: {
-        _id: data_company._id,
-        name_company: data_company.name_company,
-        name_founder: data_company.name_founder,
-        nit_company: data_company.nit_company,
-        available_plans: data_company.available_plans,
-        type_available_plans: data_company.type_available_plans,
-        months_quantity: data_company.months_quantity,
-        expired_available_plans: data_company.expired_available_plans,
-      },
+      // company: {
+      //   _id: data_company._id,
+      //   name_company: data_company.name_company,
+      //   name_founder: data_company.name_founder,
+      //   nit_company: data_company.nit_company,
+      //   available_plans: data_company.available_plans,
+      //   type_available_plans: data_company.type_available_plans,
+      //   months_quantity: data_company.months_quantity,
+      //   expired_available_plans: data_company.expired_available_plans,
+      // },
+      company: company_id,
       document_type_client,
       number_document_client,
       name_client,
@@ -78,6 +102,21 @@ export const update_client_company = async (req, res) => {
   try {
     const { company_id, client_id } = req.params;
 
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
+
     const updating_data = {
       document_type_client: req.body.document_type_client,
       number_document_client: req.body.number_document_client,
@@ -86,7 +125,7 @@ export const update_client_company = async (req, res) => {
       phone_client: req.body.phone_client,
     };
 
-    const company_data = await Client.findOne({ "company._id": company_id });
+    const company_data = await Client.findOne({ company: company_id });
     if (!company_data)
       return res.status(404).json({ msj: "Cliente no encontrado en empresa" });
 
@@ -140,13 +179,28 @@ export const list_client_company = async (req, res) => {
   try {
     const { company_id } = req.params;
 
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
+
     const data_company = await Company.findById(company_id);
     if (!data_company)
       return res
         .status(404)
         .json({ msj: "Empresa no encontrada", status: false });
 
-    const filter = { "company._id": company_id };
+    const filter = { company: company_id };
     const cant = await Client.countDocuments(filter);
 
     const data = await Client.find(filter)
@@ -179,11 +233,26 @@ export const delete_client_company = async (req, res) => {
   try {
     const { client_id } = req.params;
 
+    const is_company = req.user.type_dato === "company";
+    const is_super_admin = req.user.role === "Super Admin";
+    const is_user_company = req.user.type_dato === "user_company";
+
     let client_data = await Client.findById(client_id);
     if (!client_data)
       return res
         .status(404)
         .json({ msj: "Cliente no encontrado", status: false });
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== client_data.company
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
 
     await Promise.all([
       Client.deleteOne({ _id: client_id }),

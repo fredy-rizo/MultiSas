@@ -21,6 +21,21 @@ export const create_supplier_company = async (req, res) => {
       city_supplier,
     } = req.body;
 
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
+
     const data_company = await Company.findById(company_id);
     if (!data_company)
       return res
@@ -43,16 +58,7 @@ export const create_supplier_company = async (req, res) => {
       });
 
     const new_create_supplier = await Supplier.create({
-      company: {
-        _id: data_company._id,
-        name_company: data_company.name_company,
-        name_founder: data_company.name_founder,
-        nit_company: data_company.nit_company,
-        available_plans: data_company.available_plans,
-        type_available_plans: data_company.type_available_plans,
-        months_quantity: data_company.months_quantity,
-        expired_available_plans: data_company.expired_available_plans,
-      },
+      company: company_id,
       document_type_supplier,
       number_document_supplier,
       company_name,
@@ -100,6 +106,21 @@ export const create_supplier_company = async (req, res) => {
 export const update_supplier_company = async (req, res) => {
   try {
     const { company_id, supplier_id } = req.params;
+
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
 
     const company_data = await Company.findById(company_id);
     if (!company_data)
@@ -175,6 +196,21 @@ export const list_supplier_company = async (req, res) => {
   try {
     const { company_id } = req.params;
 
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
+
     const data_company = await Company.findById(company_id);
     if (!data_company)
       return res
@@ -225,6 +261,21 @@ export const delete_supplier_company = async (req, res) => {
       return res
         .status(404)
         .json({ msj: "Proveedor no encontrado", status: false });
+
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== supplier_data.company
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
 
     await Promise.all([
       Supplier.deleteOne({ _id: supplier_id }),

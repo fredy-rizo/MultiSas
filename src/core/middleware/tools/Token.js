@@ -96,6 +96,7 @@ export const TokenAny = async (req, res, next) => {
     const decoded = jwt.verify(token, config.SECRET);
 
     let company = await Company.findById(decoded._id);
+    // console.log("company en token", company._id);
     if (company) {
       req.user = {
         id: company.id,
@@ -144,7 +145,9 @@ export const TokenAuthorize = (...roles) => {
         return res
           .status(403)
           .json({ msj: "No tienes permisos", status: false });
-    } else if (req.user.type_dato === "user_company") {
+    }
+
+    if (req.user.type_dato === "user_company") {
       data_user = await UserCompany.findById(req.user.id);
 
       if (!data_user)
@@ -154,6 +157,11 @@ export const TokenAuthorize = (...roles) => {
 
       if (!data_user.active)
         return res.status(403).json({ msj: "Usuario inactivo", status: false });
+
+      if (!roles.includes(data_user.role_user_company))
+        return res
+          .status(403)
+          .json({ msj: "No tienes permisos", status: false });
     }
 
     next();

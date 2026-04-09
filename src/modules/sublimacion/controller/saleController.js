@@ -21,6 +21,21 @@ export const create_sale = async (req, res) => {
 
     // purchase_method → Forma de pago simulada(no almacenado)
 
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
+
     if (!quantity || quantity <= 0)
       return res.status(203).json({
         msj: "La cantidad a comprar debe ser maypr a 0",
@@ -63,15 +78,7 @@ export const create_sale = async (req, res) => {
         priority_production: production_data.priority_production,
         production_finalized_date: production_data.production_finalized_date,
       },
-      company: {
-        _id: data_company._id.toString(),
-        name_company: data_company.name_company,
-        name_founder: data_company.name_founder,
-        nit_company: data_company.nit_company,
-        available_plans: data_company.available_plans,
-        months_quantity: data_company.months_quantity,
-        expired_available_plans: data_company.expired_available_plans,
-      },
+      company: company_id,
       payment_method,
       quantity: Number(quantity),
       price: production_data.price_production,
@@ -194,6 +201,21 @@ export const list_sale = async (req, res) => {
   try {
     const { company_id } = req.params;
 
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
+
     const data_company = await Company.findById(company_id);
     if (!data_company)
       return res
@@ -234,6 +256,21 @@ export const list_sale = async (req, res) => {
 export const list_sale_company_id = async (req, res) => {
   try {
     const { company_id, sale_id } = req.params;
+
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
 
     const data_company = await Company.findById(company_id);
     if (!data_company)

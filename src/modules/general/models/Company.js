@@ -164,6 +164,8 @@ const companySchema = new Schema(
 
     bill_counter_batch → Contador para enumerar lotes en farmacia
 
+    bill_counter_sale_pharmacy → Contador para enumerar ventas en farmacia
+
 */
 
 export const encrypt_password = async (password) => {

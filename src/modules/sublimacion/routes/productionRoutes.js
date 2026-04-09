@@ -6,6 +6,7 @@ import {
 } from "../../../core/middleware/tools/Token.js";
 import { Paginate } from "../../../core/middleware/tools/Pagination.js";
 import {
+  assigned_user_production,
   create_production,
   finalized_production,
   list_productions_company,
@@ -19,7 +20,14 @@ router.post(
   TokenAny,
   TokenAuthorize("Admin", "Super Admin"),
   create_production,
-); // pasar a produccion pedido
+); // pasar pedido a produccion
+
+router.post(
+  "/:company_id/assigned/:production_id",
+  TokenAny,
+  TokenAuthorize("Admin", "Super Admin"),
+  assigned_user_production,
+); // Asignar empleado(responsable) a producccion
 
 router.post(
   "/finalized/:company_id/:pedido_id/:production_id",

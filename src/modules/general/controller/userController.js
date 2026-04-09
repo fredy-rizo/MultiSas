@@ -157,11 +157,27 @@ export const update_data_company = async (req, res) => {
       months_quantity,
     } = req.body;
 
+    // if (req.user.type_dato === "company") {
+    //   if (req.user.id !== company_id)
+    //     return res
+    //       .status(403)
+    //       .json({ msj: "No puedes actualizar otra empresa", status: false });
+    // }
+
     // if (req.user.role_user !== "Super Admin")
     //   return res.status(403).json({
     //     msj: "No tienes permisos para realizar esta funcion",
     //     status: false,
     //   });
+
+    const is_company = req.user.type_dato === "company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (!is_super_admin || !is_company)
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
 
     const company = await Company.findById(company_id);
     if (!company)
@@ -233,6 +249,23 @@ export const create_user_company_by_admin = async (req, res) => {
     //     status: false,
     //   });
 
+    // if (req.user.type_dato === "company") {
+    //   if (req.user.id !== company_id)
+    //     return res.status(403).json({
+    //       msj: "No puedes acceder a esta funcion 'CTRL'",
+    //       status: false,
+    //     });
+    // }
+
+    const is_company = req.user.type_dato === "company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (!is_super_admin && is_company && req.user.id !== company_id)
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
+
     let data_company = await Company.findById(company_id);
     if (!data_company)
       return res
@@ -265,16 +298,17 @@ export const create_user_company_by_admin = async (req, res) => {
     );
 
     const new_user_company = await UserCompany.create({
-      company: {
-        _id: data_company._id,
-        name_company: data_company.name_company,
-        name_founder: data_company.name_founder,
-        nit_company: data_company.nit_company,
-        available_plans: data_company.available_plans,
-        type_available_plans: data_company.type_available_plans,
-        months_quantity: data_company.months_quantity,
-        expired_available_plans: data_company.expired_available_plans,
-      },
+      // company: {
+      //   _id: data_company._id,
+      //   name_company: data_company.name_company,
+      //   name_founder: data_company.name_founder,
+      //   nit_company: data_company.nit_company,
+      //   available_plans: data_company.available_plans,
+      //   type_available_plans: data_company.type_available_plans,
+      //   months_quantity: data_company.months_quantity,
+      //   expired_available_plans: data_company.expired_available_plans,
+      // },
+      company: company_id,
       email_user_company,
       name_user_company,
       role_user_company,
@@ -317,6 +351,7 @@ export const create_user_company_by_admin = async (req, res) => {
 
 export const active_account_by_company = async (req, res) => {
   try {
+    // const {company_id, user_company_id } = req.params;
     const { user_company_id } = req.params;
     const { active } = req.body;
 
@@ -324,7 +359,36 @@ export const active_account_by_company = async (req, res) => {
     if (!data_user_company)
       return res
         .status(404)
-        .json({ msj: "Usuario no encontrado en empresa", status: false });
+        .json({ msj: "Usuario no encontrado", status: false });
+
+    // if (req.user.type_dato === "company") {
+    //   if (req.user.id !== data_user_company.company)
+    //     return res.status(404).json({
+    //       msj: "No puedes acceder a esta funcion 'CTRL'",
+    //       status: false,
+    //     });
+    // }
+
+    const is_company = req.user.type_dato === "company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      req.user.id !== data_user_company.company
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
+
+    // const [company_data, user_company_data] = await Promise.all([
+    //   Company.findById(company_id),
+    //   UserCompany.findById(user_company_id)
+    // ])
+
+    // if(!company_data) return res.status(404).json({msj: "Empresa no encontrada", status: false})
+    // if(!user_company_data) return res.status(404).json({msj: "Usuario no encontrado", status: false})
 
     const result = await UserCompany.updateOne(
       { _id: user_company_id },
@@ -412,16 +476,17 @@ export const login_user_by_company = async (req, res) => {
       status: true,
       token,
       data: {
-        company: {
-          _id: user_company.company._id,
-          name_company: user_company.company.name_company,
-          name_founder: user_company.company.name_founder,
-          nit_company: user_company.company.nit_company,
-          available_plans: user_company.company.available_plans,
-          type_available_plans: user_company.company.type_available_plans,
-          months_quantity: user_company.company.months_quantity,
-          expired_available_plans: user_company.company.expired_available_plans,
-        },
+        // company: {
+        //   _id: user_company.company._id,
+        //   name_company: user_company.company.name_company,
+        //   name_founder: user_company.company.name_founder,
+        //   nit_company: user_company.company.nit_company,
+        //   available_plans: user_company.company.available_plans,
+        //   type_available_plans: user_company.company.type_available_plans,
+        //   months_quantity: user_company.company.months_quantity,
+        //   expired_available_plans: user_company.company.expired_available_plans,
+        // },
+        company: user_company.company,
         email_user_company: user_company.email_user_company,
         name_user_company: user_company.name_user_company,
         role_user_company: user_company.role_user_company,
@@ -504,20 +569,38 @@ export const list_user_by_company_active = async (req, res) => {
   try {
     const { company_id } = req.params;
 
+    // if (req.user.type_dato === "company") {
+    //   if (req.user.id !== company_id)
+    //     return res.status(403).json({
+    //       msj: "No tienes acceso a esta funcion 'CTRL'",
+    //       status: false,
+    //     });
+    // }
+
+    const is_company = req.user.type_dato === "company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (!is_super_admin && is_company && req.user.id !== company_id)
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
+
     const data_company = await Company.findById(company_id);
     if (!data_company)
       return res
         .status(404)
         .json({ msj: "Empresa no encontrada", status: false });
 
-    const cant = await UserCompany.find({
-      "company._id": company_id,
+    const filter = {
+      company_id: company_id,
       active: true,
-    }).countDocuments();
-    const data = await UserCompany.find({
-      "company._id": company_id,
-      active: true,
-    })
+    };
+
+    // console.log("filterrrrrr", filter);
+
+    const cant = await UserCompany.find(filter).countDocuments();
+    const data = await UserCompany.find(filter)
       .skip(req.body.skippag)
       .limit(req.body.limit)
       .sort({ _id: -1 });
@@ -527,7 +610,7 @@ export const list_user_by_company_active = async (req, res) => {
       status: true,
       data,
       pagination: {
-        pags: req.params.pag,
+        pag: req.params.pag,
         perpage: req.body.limit,
         pags: Math.ceil(cant / req.body.limit),
       },
@@ -547,18 +630,38 @@ export const list_user_by_company_not_active = async (req, res) => {
   try {
     const { company_id } = req.params;
 
+    // if (req.user.type_dato === "company") {
+    //   if (req.user.id !== company_id)
+    //     return res.status(403).json({
+    //       msj: "No tienes acceso a esta funcion 'CTRL'",
+    //       status: false,
+    //     });
+    // }
+
+    const is_company = req.user.type_dato === "company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (!is_super_admin && is_company && req.user.id !== company_id)
+      return res
+        .status(403)
+        .json({
+          msj: "No puedes acceder a esta funcion 'CTRL'",
+          status: false,
+        });
+
     const data_company = await Company.findById(company_id);
     if (!data_company)
       return res.status(404).json({ msj: "Empresa no encontrada" });
 
-    const cant = await UserCompany.find({
-      "company._id": company_id,
+    const filter = {
+      company_id: company_id,
       active: false,
-    }).countDocuments();
-    const data = await UserCompany.find({
-      "company._id": company_id,
-      active: false,
-    })
+    };
+
+    // console.log("filterrr", filter);
+
+    const cant = await UserCompany.find(filter).countDocuments();
+    const data = await UserCompany.find(filter)
       .skip(req.body.skippag)
       .limit(req.body.limit)
       .sort({ _id: -1 });
@@ -568,7 +671,7 @@ export const list_user_by_company_not_active = async (req, res) => {
       status: true,
       data,
       pagination: {
-        pags: req.params.pag,
+        pag: req.params.pag,
         perpage: req.body.limit,
         pags: Math.ceil(cant / req.body.limit),
       },

@@ -11,21 +11,10 @@ const pedidoSchema = new Schema(
     quantity_pedido: String,
     price_pedido: String,
     moneda: { type: String, default: "COP" },
-    company: {
-      _id: String,
-      name_company: String,
-      name_founder: String,
-      nit_company: String,
-      available_plans: String,
-      months_quantity: Number,
-      expired_available_plans: String,
-    },
+    company: String,
     client: {
       _id: String,
-      document_type_client: String,
-      number_document_client: String,
       name_client: String,
-      email_client: String,
       phone_client: String,
     },
     state_pedido: {

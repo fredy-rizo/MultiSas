@@ -3,16 +3,17 @@ const { Schema } = mongoose;
 
 const clientSchema = new Schema(
   {
-    company: {
-      _id: String,
-      name_company: String,
-      name_founder: String,
-      nit_company: String,
-      available_plans: String,
-      type_available_plans: String,
-      months_quantity: Number,
-      expired_available_plans: String,
-    },
+    // company: {
+    //   _id: String,
+    //   name_company: String,
+    //   name_founder: String,
+    //   nit_company: String,
+    //   available_plans: String,
+    //   type_available_plans: String,
+    //   months_quantity: Number,
+    //   expired_available_plans: String,
+    // },
+    company: String,
     document_type_client: {
       type: String,
       enum: ["CC", "NIT", "CE", "PP", ""],

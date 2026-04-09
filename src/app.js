@@ -19,6 +19,7 @@ import Client from "./modules/sublimacion/routes/clientRoutes.js";
 import Sale from "./modules/sublimacion/routes/saleRoutes.js";
 import Pedido from "./modules/sublimacion/routes/pedidoRoutes.js";
 import Production from "./modules/sublimacion/routes/productionRoutes.js";
+import Briefcase from "./modules/sublimacion/routes/briefcaseRoutes.js";
 
 // TODO → Restaurante
 import Category from "./modules/restaurante/routes/categoryRoutes.js";
@@ -60,6 +61,7 @@ app.use("/api/client", Client);
 app.use("/api/sale", Sale);
 app.use("/api/pedido", Pedido);
 app.use("/api/production", Production);
+app.use("/api/briefcase", Briefcase);
 
 // TODO → Restaurante
 app.use("/api/category", Category);

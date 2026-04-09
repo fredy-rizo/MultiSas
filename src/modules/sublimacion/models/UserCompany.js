@@ -4,16 +4,17 @@ const { Schema } = mongoose;
 
 const userCompanySchema = new Schema(
   {
-    company: {
-      _id: String,
-      name_company: String,
-      name_founder: String,
-      nit_company: String,
-      available_plans: String,
-      type_available_plans: String,
-      months_quantity: Number,
-      expired_available_plans: String,
-    },
+    // company: {
+    //   _id: String,
+    //   name_company: String,
+    //   name_founder: String,
+    //   nit_company: String,
+    //   available_plans: String,
+    //   type_available_plans: String,
+    //   months_quantity: Number,
+    //   expired_available_plans: String,
+    // },
+    company: String,
     token: { type: String, default: "" },
     email_user_company: String,
     name_user_company: String,
@@ -33,7 +34,7 @@ const userCompanySchema = new Schema(
 );
 
 /*
-    company - traer todos los datos de la empresa por su ID
+    company → ID de empresa
 
     
     email_user_company → email del vendedor/consultor del usuario de la empresa

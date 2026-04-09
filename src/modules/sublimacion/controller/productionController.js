@@ -2,6 +2,7 @@ import { generate_bill_counter_production } from "../../../core/middleware/lib/B
 import { Production } from "../models/Production.js";
 import { Company } from "../../general/models/Company.js";
 import { Pedido } from "../models/Pedido.js";
+import { UserCompany } from "../models/UserCompany.js";
 
 /**
  * @param {import('express').Request} req
@@ -16,6 +17,15 @@ export const create_production = async (req, res) => {
       delivery_date_production,
       priority_production,
     } = req.body;
+
+    const is_company = req.user.type_dato === "company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (!is_super_admin && is_company && req.user.id !== company_id)
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
 
     const companyX = await Company.findById(company_id);
     if (!companyX)
@@ -48,10 +58,7 @@ export const create_production = async (req, res) => {
       },
       client: {
         _id: pedidoX.client._id,
-        document_type_client: pedidoX.client.document_type_client,
-        number_document_client: pedidoX.client.number_document_client,
         name_client: pedidoX.client.name_client,
-        email_client: pedidoX.client.email_client,
         phone_client: pedidoX.client.phone_client,
       },
       pedido: {
@@ -103,10 +110,91 @@ export const create_production = async (req, res) => {
  * @param {import('express').Response} res
  */
 
+export const assigned_user_production = async (req, res) => {
+  try {
+    const { company_id, production_id } = req.params;
+    const { user_company_id } = req.body;
+
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
+
+    const [company_data, production_data] = await Promise.all([
+      Company.findById(company_id),
+      Production.findById(production_id),
+    ]);
+
+    if (!company_data)
+      return res
+        .status(404)
+        .json({ msj: "Empresa no encontrada", status: false });
+    if (!production_data)
+      return res
+        .status(404)
+        .json({ msj: "Produccion no encontrada", status: false });
+
+    const user_company_data = await UserCompany.findById(user_company_id);
+    if (!user_company_data)
+      return res
+        .status(404)
+        .json({ msj: "Empleado no encontrado", status: false });
+
+    await Production.updateOne(
+      { _id: production_id },
+      {
+        $set: {
+          userCompany: {
+            _id: user_company_data._id.toString(),
+            name_user_company: user_company_data.name_user_company,
+          },
+        },
+      },
+    );
+
+    res
+      .status(200)
+      .json({ msj: "Empleado asignado a produccion", statis: true });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+};
+
+/**
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+
 export const finalized_production = async (req, res) => {
   try {
     const { company_id, pedido_id, production_id } = req.params;
     const { finalized_production } = req.body;
+
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
 
     const companyX = await Company.findById(company_id);
     if (!companyX)
@@ -170,6 +258,21 @@ export const list_productions_company = async (req, res) => {
     const { company_id, production_id, query } = req.params;
     const filter = Number(query);
 
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
+
     const companyX = await Company.findById(company_id).lean();
     if (!companyX)
       return res
@@ -228,6 +331,21 @@ export const list_productions_company = async (req, res) => {
 export const list_productions_company_id = async (req, res) => {
   try {
     const { company_id, production_id } = req.params;
+
+    const is_company = req.user.type_dato === "company";
+    const is_user_company = req.user.type_dato === "user_company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (
+      !is_super_admin &&
+      is_company &&
+      is_user_company &&
+      req.user.id !== company_id
+    )
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
 
     const companyX = await Company.findOne({ _id: company_id });
     if (!companyX)
