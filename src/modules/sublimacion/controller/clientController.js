@@ -125,7 +125,7 @@ export const update_client_company = async (req, res) => {
       phone_client: req.body.phone_client,
     };
 
-    const company_data = await Client.findOne({ company: company_id });
+    const company_data = await Client.findOne({ _id: client_id });
     if (!company_data)
       return res.status(404).json({ msj: "Cliente no encontrado en empresa" });
 
