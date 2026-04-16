@@ -249,3 +249,40 @@ export const list_inactive_employee = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+/**
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+
+export const delete_employee = async (req, res) => {
+  try {
+    const { employee_id } = req.params;
+
+    let employee_data = await Employee.findById(employee_id);
+    if (!employee_data)
+      return res
+        .status(404)
+        .json({ msj: "Empleado no encontrado", status: false });
+
+    const is_company = req.user.type_dato === "company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (!is_company && is_super_admin && req.user.id !== employee_data.company)
+      return res
+        .status(403)
+        .json({
+          msj: "No puedes acceder a esta funcion 'CTRL'",
+          status: false,
+        });
+
+    await Employee.deleteOne({ _id: employee_id });
+
+    res
+      .status(200)
+      .json({ msj: "Empleado eliminado exitosamente", status: true });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+};

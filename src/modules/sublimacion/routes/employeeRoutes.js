@@ -6,6 +6,7 @@ import {
 } from "../../../core/middleware/tools/Token.js";
 import {
   create_employee,
+  delete_employee,
   list_active_employee,
   list_employee_company,
   list_inactive_employee,
@@ -50,5 +51,12 @@ router.get(
   Paginate,
   list_inactive_employee,
 ); // Listar empleados activos
+
+router.delete(
+  "/remove/:employee_id",
+  TokenAny,
+  TokenAuthorize("Admin", "Super Admin"),
+  delete_employee,
+); // Eliminar empleado
 
 export default router;
