@@ -642,12 +642,10 @@ export const list_user_by_company_not_active = async (req, res) => {
     const is_super_admin = req.user.role === "Super Admin";
 
     if (!is_super_admin && is_company && req.user.id !== company_id)
-      return res
-        .status(403)
-        .json({
-          msj: "No puedes acceder a esta funcion 'CTRL'",
-          status: false,
-        });
+      return res.status(403).json({
+        msj: "No puedes acceder a esta funcion 'CTRL'",
+        status: false,
+      });
 
     const data_company = await Company.findById(company_id);
     if (!data_company)
@@ -679,5 +677,159 @@ export const list_user_by_company_not_active = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
+  }
+};
+
+// ------------------------
+export const calcular_nomina = async (req, res) => {
+  try {
+    const { company_id, nomina_id } = req.params;
+
+    const company_data = await Company.findById(company_id);
+    if (!company_data) {
+      return res.status(404).json({
+        msj: "Empresa no encontrada",
+        status: false,
+      });
+    }
+
+    const nomina_data = await Roster.findById(nomina_id);
+    if (!nomina_data) {
+      return res.status(404).json({
+        msj: "Nomina no encontrada",
+        status: false,
+      });
+    }
+
+    const empleados = await Employee.find({
+      stade_employee: "Activo",
+      company: company_id,
+    });
+
+    if (!empleados.length) {
+      return res.status(404).json({
+        msj: "No hay empleados activos",
+        status: false,
+      });
+    }
+
+    for (const emp of empleados) {
+      const salario = emp.base_saraly_employee;
+
+      const salud = salario * 0.04;
+      const pension = salario * 0.04;
+
+      const auxilio = salario <= 2 * 1750000 ? 200000 : 0;
+
+      const accrued = salario + auxilio;
+      const deduction = salud + pension;
+      const net = accrued - deduction;
+
+      const detalle = await DetailedPayroll.create({
+        nomina: nomina_id,
+        employee: emp._id,
+        base_saraly_employee: salario,
+        days_worked: 30,
+        accrued,
+        deduction,
+        net,
+      });
+
+      await PayrollConcept.insertMany([
+        {
+          nomina_detalle_id: detalle._id,
+          name_concept: "salario",
+          type_concept: "devengado",
+          valor: salario,
+        },
+        {
+          nomina_detalle_id: detalle._id,
+          name_concept: "auxilio_transporte",
+          type_concept: "devengado",
+          valor: auxilio,
+        },
+        {
+          nomina_detalle_id: detalle._id,
+          name_concept: "salud",
+          type_concept: "deduccion",
+          valor: salud,
+        },
+        {
+          nomina_detalle_id: detalle._id,
+          name_concept: "pension",
+          type_concept: "deduccion",
+          valor: pension,
+        },
+      ]);
+    }
+
+    await Roster.findByIdAndUpdate(nomina_id, {
+      stade: "Calculada",
+    });
+
+    return res.status(200).json({
+      msj: "Nomina calculada exitosamente",
+      status: true,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(err);
+  }
+};
+
+export const recalcular_nomina = async (req, res) => {
+  try {
+    const { company_id, nomina_id } = req.params;
+
+    const is_company = req.user.type_dato === "company";
+    const is_super_admin = req.user.role === "Super Admin";
+
+    if (!is_super_admin && is_company && req.user.id !== company_id) {
+      return res.status(403).json({
+        msj: "No puedes acceder a esta función",
+        status: false,
+      });
+    }
+
+    const company_data = await Company.findById(company_id);
+    if (!company_data) {
+      return res.status(404).json({
+        msj: "Empresa no encontrada",
+        status: false,
+      });
+    }
+
+    const nomina_data = await Roster.findById(nomina_id);
+    if (!nomina_data) {
+      return res.status(404).json({
+        msj: "Nomina no encontrada",
+        status: false,
+      });
+    }
+
+    const detalles = await DetailedPayroll.find({
+      nomina: nomina_id,
+    });
+
+    const detalles_id = detalles.map((item) => item._id);
+
+    await Promise.all([
+      PayrollConcept.deleteMany({
+        nomina_detalle_id: { $in: detalles_id },
+      }),
+
+      DetailedPayroll.deleteMany({
+        nomina: nomina_id,
+      }),
+
+      Roster.findByIdAndUpdate(nomina_id, {
+        stade: "draft",
+      }),
+    ]);
+
+    return calcular_nomina(req, res);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(err);
   }
 };

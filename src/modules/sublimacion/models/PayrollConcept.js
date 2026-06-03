@@ -3,11 +3,13 @@ const { Schema } = mongoose;
 
 const payrollConceptSchema = new Schema(
   {
+    nomina_detalle_id: String,
     name_concept: String,
     type_concept: {
       type: String,
       enum: ["devengado", "deduccion"],
     },
+    valor: Number,
     formula: String,
     company: String,
   },

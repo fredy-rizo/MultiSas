@@ -21,6 +21,7 @@ import Pedido from "./modules/sublimacion/routes/pedidoRoutes.js";
 import Production from "./modules/sublimacion/routes/productionRoutes.js";
 import Briefcase from "./modules/sublimacion/routes/briefcaseRoutes.js";
 import Employee from "./modules/sublimacion/routes/employeeRoutes.js";
+import Roster from "./modules/sublimacion/routes/rosterRoutes.js";
 
 // TODO → Restaurante
 import Category from "./modules/restaurante/routes/categoryRoutes.js";
@@ -64,6 +65,7 @@ app.use("/api/pedido", Pedido);
 app.use("/api/production", Production);
 app.use("/api/briefcase", Briefcase);
 app.use("/api/employee", Employee);
+app.use("/api/roster", Roster);
 
 // TODO → Restaurante
 app.use("/api/category", Category);
