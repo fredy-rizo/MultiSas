@@ -5,12 +5,13 @@ import {
 } from "../models/Company.js";
 import config from "../../../config.js";
 import jwt from "jsonwebtoken";
-import { modulesByType } from "../../../core/middleware/tools/modules.js";
+// import { modulesByType } from "../../../core/middleware/tools/modules.js";
 import {
   compare_password_user_company,
   encrypt_password_user_company,
   UserCompany,
 } from "../../sublimacion/models/UserCompany.js";
+import { companyConfig } from "../../../core/middleware/lib/companyConfig.js";
 
 /**
  * @param {import('express').Request} req
@@ -28,11 +29,27 @@ export const register_company = async (req, res) => {
         status: false,
       });
 
-    const modules = modulesByType[type_company];
+    // const modules = modulesByType[type_company];
     // if (!modules)
     //   return res
     //     .status(400)
     //     .json({ msj: "Tipo de empresa invalido", status: false });
+
+    // const config = companyConfig[type_company]
+    // if (!config) return res.status(400).json({ msj: "Tipo de empresa invalido", status: false })
+
+    let counters = {}
+    let role_user = "Super Admin"
+
+    if (type_company) {
+      const config = companyConfig[type_company]
+
+      if (!config) return res.status(400).json({ msj: "Tipo de empresa invalida", status: false })
+
+      counters = config.counters
+    } else {
+      role_user = "Super Admin"
+    }
 
     let data_nit_company = await Company.findOne({ nit_company });
     if (data_nit_company)
@@ -48,7 +65,8 @@ export const register_company = async (req, res) => {
       name_founder,
       nit_company,
       type_company, //! Enviarlo SIEMPRE, no enviarlo para Super Admin
-      modules,
+      // modules,
+      counters,
       active_account: [{ name: "Pendiente", value: "1" }],
     });
 
@@ -207,7 +225,8 @@ export const update_data_company = async (req, res) => {
       { _id: company._id },
       {
         $set: {
-          // role_user,
+          role_user: "Admin",
+          active_account: [{ name: "Activo", value: "2" }],
           available_plans,
           type_available_plans,
           months_quantity,

@@ -5,7 +5,21 @@ const productSchema = new Schema(
   {
     bill_counter: String,
     name_product: String,
-    category_product: String,
+    category_product: {
+      type: String,
+      enum: [
+        "analgesicos",
+        "antibioticos",
+        "gastrointestinal",
+        "antialergicos",
+        "diabetes",
+        "cardiovascular",
+        "vitaminas",
+        "higiene",
+        "material medico",
+        "respiratorio",
+      ],
+    },
     cost_product: String,
     price_product: String,
     unit_product: {
@@ -32,7 +46,7 @@ const productSchema = new Schema(
         quantity: Number,
       },
     ],
-    // expiration_date_product: String,
+    expiration_date_product: String,
     company: String,
   },
   { timestamps: true },

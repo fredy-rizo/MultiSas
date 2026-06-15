@@ -33,26 +33,42 @@ const companySchema = new Schema(
       enum: ["Mensual", "Anual", "Vacio", "Permanente"],
       default: "Vacio",
     },
-    modules: { type: [String], default: [] },
+    // modules: { type: [String], default: [] },
     months_quantity: { type: Number, default: 0 },
     day_available_plans: { type: String, default: "" },
     expired_available_plans: { type: String, default: "" },
-    bill_counter: { type: Number, default: 0 },
-    bill_counter_brief_case: { type: Number, default: 0 },
-    bill_counter_shopping: { type: Number, default: 0 },
-    bill_counter_pedido: { type: Number, default: 0 },
-    bill_counter_production: { type: Number, default: 0 },
-    bill_counter_credit: { type: Number, default: 0 },
-    bill_counter_debit: { type: Number, default: 0 },
-    bill_counter_pedido_restaurante: { type: Number, default: 0 },
-    bill_counter_pharmacy: { type: Number, default: 0 },
-    bill_counter_sale_pharmacy: { type: Number, default: 0 },
-    bill_counter_batch: { type: Number, default: 0 },
+    counters: {
+      type: Map,
+      of: Number,
+      default: {}
+    },
+    // bill_counter: { type: Number, default: 0 },
+    // bill_counter_brief_case: { type: Number, default: 0 },
+    // bill_counter_shopping: { type: Number, default: 0 },
+    // bill_counter_pedido: { type: Number, default: 0 },
+    // bill_counter_production: { type: Number, default: 0 },
+    // bill_counter_credit: { type: Number, default: 0 },
+    // bill_counter_debit: { type: Number, default: 0 },
+    // bill_counter_pedido_restaurante: { type: Number, default: 0 },
+    // bill_counter_pharmacy: { type: Number, default: 0 },
+    // bill_counter_sale_pharmacy: { type: Number, default: 0 },
+    // bill_counter_batch: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now() },
     updatedAt: { type: Date, default: Date.now() },
   },
   { timestamps: true },
 );
+
+export const encrypt_password = async (password) => {
+  const salt = await bcrypt.genSalt(6);
+  return await bcrypt.hash(password, salt);
+};
+
+export const compare_password = async (password, received_password) => {
+  return await bcrypt.compare(password, received_password);
+};
+
+export const Company = mongoose.model("company", companySchema);
 
 /*
     type_company → si es empresa de ferreteria, sublimacion, hotel, drogueria, verdureria, etc...
@@ -168,13 +184,4 @@ const companySchema = new Schema(
 
 */
 
-export const encrypt_password = async (password) => {
-  const salt = await bcrypt.genSalt(6);
-  return await bcrypt.hash(password, salt);
-};
 
-export const compare_password = async (password, received_password) => {
-  return await bcrypt.compare(password, received_password);
-};
-
-export const Company = mongoose.model("company", companySchema);

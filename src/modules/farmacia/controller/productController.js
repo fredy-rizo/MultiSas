@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import {
   generate_bill_number_batch,
   generate_bill_number_phaymacy,
+  gobal_bill,
 } from "../../../core/middleware/lib/BillNumber.js";
 import { Company } from "../../general/models/Company.js";
 import { Product } from "../models/Product.js";
@@ -47,39 +48,42 @@ export const create_product = async (req, res) => {
         .status(404)
         .json({ msj: "Empresa no encontrada", status: false });
 
+    // console.log(batch_product);
+    // console.log(typeof batch_product);
+    // console.log(Array.isArray(batch_product));
+
+    const bill_counter_pharmacy = await gobal_bill(
+      company_id,
+      "bill_counter_pharmacy",
+      "FAR",
+    );
+
+    if (!Array.isArray(batch_product) || batch_product.length === 0)
+      return res
+        .status(400)
+        .json({ msj: "Debe enviar al menos un lote", status: false });
+
     const parsed_batches = batch_product.map((batch, index) => {
       if (!batch.lote || !batch.expiration_date || !batch.quantity) {
         throw new Error(`Datos incompletos en lote ${index + 1}`);
       }
 
-      let parsedDate;
+      const parsedDate = new Date(batch.expiration_date);
 
-      if (/^\d{4}-\d{2}-\d{2}$/.test(batch.expiration_date)) {
-        const [year, month, day] = batch.expiration_date.split("-");
-        parsedDate = new Date(year, month - 1, day);
-      } else if (/^\d{2}\/\d{2}\/\d{2}$/.test(batch.expiration_date)) {
-        const [day, month, year] = batch.expiration_date.split("/");
-        parsedDate = new Date(`20${year}`, month - 1, day);
-      } else {
+      if (isNaN(parsedDate.getTime()))
         throw new Error(
-          `Formato de fecha inválido en lote ${index + 1}: ${batch.expiration_date}`,
+          `Fecha invalida en lote ${index + 1}: ${batch.expiration_date}`,
         );
-      }
-      if (!(parsedDate instanceof Date) || isNaN(parsedDate)) {
-        throw new Error(
-          `Fecha inválida en lote ${index + 1}: ${batch.expiration_date}`,
-        );
-      }
 
       return {
         lote: batch.lote,
         expiration_date: parsedDate,
-        quantity: batch.quantity,
+        quantity: Number(batch.quantity),
       };
     });
 
-    const bill_counter_pharmacy =
-      await generate_bill_number_phaymacy(company_id);
+    // const bill_counter_pharmacy =
+    //   await generate_bill_number_phaymacy(company_id);
     // const bill_counter_batch = await generate_bill_number_batch(company_id);
 
     const new_product_pharmacy = new Product({
@@ -125,7 +129,7 @@ export const update_product = async (req, res) => {
       unit_product,
       stock_product,
       minimum_stock_product,
-      expiration_date_product,
+      // expiration_date_product,
     } = req.body;
 
     const company_data = await Company.findById(company_id);
@@ -152,7 +156,7 @@ export const update_product = async (req, res) => {
           unit_product,
           stock_product,
           minimum_stock_product,
-          expiration_date_product,
+          // expiration_date_product,
         },
       },
     );

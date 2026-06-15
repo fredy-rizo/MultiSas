@@ -123,7 +123,7 @@ export const generate_bill_number_pedido_restaurante = async (company_id) => {
 export const generate_bill_number_phaymacy = async (company_id) => {
   const company = await Company.findByIdAndUpdate(
     company_id,
-    { $inc: { bill_counter_pharmacy: 1 } },
+    { $inc: { "counters.bill_counter_pharmacy": 1 } },
     { new: true },
   );
 
@@ -165,3 +165,19 @@ export const generate_bill_number_sale_pharmacy = async (company_id) => {
 
   return `FAC-${data_number}`;
 };
+
+export const gobal_bill = async (
+  company_id, counter_name, prefix
+) => {
+  const company = await Company.findByIdAndUpdate(company_id, {
+    $inc: {
+      [`counters.${counter_name}`]: 1
+    }
+  }, { new: true })
+
+  if (!company) throw new Error("Empresa no encontrada")
+
+  const counter = company.counters.get(counter_name)
+  return `${prefix}-${counter.toString().padStart(3, "0")}`
+
+}

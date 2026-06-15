@@ -23,7 +23,7 @@ router.post(
   create_product,
 ); // Crear producto en farmacia
 
-router.put(
+router.patch(
   "/:company_id/updating/:product_id",
   TokenAny,
   TokenAuthorize("Admin", "Super Admin"),
