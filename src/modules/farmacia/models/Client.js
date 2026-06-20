@@ -9,7 +9,7 @@ const clientSchema = new Schema(
     nit_client: { type: String, default: "Sin NIT" },
     type_client: {
       type: String,
-      enum: ["Individual", "Empresa", "--------------"],
+      enum: ["Natural", "Empresa", "--------------"],
       default: "--------------",
     },
     address_client: { type: String, default: "--------------" },

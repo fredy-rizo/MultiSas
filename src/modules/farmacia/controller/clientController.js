@@ -128,15 +128,24 @@ export const list_client = async (req, res) => {
 
 export const delete_client = async (req, res) => {
   try {
-    const { client_id } = req.params;
+    const { company_id, client_id } = req.params;
 
-    let client_data = await Client.findById(client_id);
-    if (!client_data)
+    const company_data = await Company.findById(company_id);
+    if (!company_data)
       return res
         .status(404)
-        .json({ msj: "Cliente no encontrado", status: false });
+        .json({ msj: "Empresa no encontrada", status: false });
 
-    await Client.deleteOne({ _id: client_id });
+    const company_client_data = await Client.findOne({
+      _id: client_id,
+      company_id: company_id,
+    });
+    if (!company_client_data)
+      return res
+        .status(404)
+        .json({ msj: "Cliente no encontrado en esta empresa", status: false });
+
+    await Client.deleteOne({ _id: client_id, company_id: company_id });
     res
       .status(200)
       .json({ msj: "Cliente eliminado exitosamente", status: true });

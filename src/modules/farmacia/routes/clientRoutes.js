@@ -19,7 +19,7 @@ router.post(
   create_client,
 ); // Crear cliente en farmacia (no obligatorio)
 
-router.put(
+router.patch(
   "/:company_id/updating/:client_id",
   TokenAny,
   TokenAuthorize("Admin", "Super Admin"),
@@ -35,7 +35,7 @@ router.get(
 ); // Listar clientes en farmacia
 
 router.delete(
-  "/:client_id",
+  "/:company_id/remove/:client_id",
   TokenAny,
   TokenAuthorize("Admin", "Super Admin"),
   delete_client,

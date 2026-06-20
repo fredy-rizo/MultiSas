@@ -1,4 +1,5 @@
-import { generate_bill_number_sale_pharmacy } from "../../../core/middleware/lib/BillNumber.js";
+// import { generate_bill_number_sale_pharmacy } from "../../../core/middleware/lib/BillNumber.js";
+import { gobal_bill } from "../../../core/middleware/lib/BillNumber.js";
 import { Company } from "../../general/models/Company.js";
 import { Product } from "../models/Product.js";
 import { Client } from "../models/Client.js";
@@ -25,28 +26,49 @@ export const create_sale = async (req, res) => {
       Product.findById(product_id),
     ]);
 
+    if (!company_data)
+      return res
+        .status(404)
+        .json({ msj: "Empresa no encontrada", status: false });
+
+    if (!product_data)
+      return res
+        .status(404)
+        .json({ msj: "Producto no encontrado", status: false });
+
+    if (product_data.company !== company_id)
+      return res.status(400).json({
+        msj: "El producto no pertecene a esta empresa",
+        status: false,
+      });
+
     let client_data = null;
 
     if (client_id) {
-      client_data = await Client.findById(client_id);
+      client_data = await Client.findOne({ _id: client_id, company_id });
+
       if (!client_data)
         return res
           .status(404)
           .json({ msj: "Cliente no encontrado", status: false });
     }
 
-    if (!company_data)
+    // Validar stock
+    if (Number(quantity) > product_data.stock_product)
       return res
-        .status(404)
-        .json({ msj: "Empresa no encontrada", status: false });
-    if (!product_data)
-      return res
-        .status(404)
-        .json({ msj: "Producto no encontrado", status: false });
+        .status(400)
+        .json({ msj: "Stock no disponible", status: false });
 
-    const bill_number = await generate_bill_number_sale_pharmacy(
+    // Restar cantidad
+    product_data.stock_product -= Number(quantity);
+    await product_data.save();
+
+    const bill_number = await gobal_bill(
       product_data.company,
+      "bill_counter_sale_pharmacy",
+      "FAC",
     );
+
     const new_sale = new Sale({
       bill_counter: bill_number,
       company: company_data._id.toString(),
