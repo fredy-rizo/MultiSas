@@ -5,9 +5,11 @@ export const supplierSchema = new Schema(
   {
     name_company: String,
     contact_name_company: String,
+    nit_company: String,
     email_company: String,
     phone_company: String,
     address_company: String,
+    city: String,
     company: String,
   },
   { timestamps: true },

@@ -2,6 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import config from "./config.js";
+import ip_query_middleware from "./core/middleware/lib/ip_query_middleware.js";
 
 // import { Token } from "./middleware/tools/Token.js";
 // import { check_plan_expiration } from "./middleware/lib/Expiration.js";
@@ -44,6 +45,7 @@ app.set("port", config.PORT);
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
+app.use(ip_query_middleware);
 
 app.use((req, res, next) => {
   console.log("Time → ", new Date());
