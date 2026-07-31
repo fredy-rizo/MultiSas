@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
 import config from "../../../config.js";
 import { Company } from "../../../modules/general/models/Company.js";
-import { UserCompany } from "../../../modules/sublimacion/models/UserCompany.js";
+// import { UserCompany } from "../../../modules/sublimacion/models/UserCompany.js";
+import { User } from "../../../modules/general/models/User.js";
 import plan from "../json/plan.json" with { type: "json" };
 
 export const Token = async (req, res, next) => {
@@ -94,6 +95,7 @@ export const TokenAny = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, config.SECRET);
+    // console.log("decoded tokenany", decoded);
 
     let company = await Company.findById(decoded._id);
     // console.log("company en token", company._id);
@@ -109,7 +111,7 @@ export const TokenAny = async (req, res, next) => {
       return next();
     }
 
-    let user_company = await UserCompany.findById(decoded._id);
+    let user_company = await User.findById(decoded._id);
     if (user_company) {
       req.user = {
         id: user_company.id,
@@ -131,6 +133,8 @@ export const TokenAny = async (req, res, next) => {
 
 export const TokenAuthorize = (...roles) => {
   return async (req, res, next) => {
+    // console.log("req.user", req.user);
+    // console.log("roles", req.user.roles);
     let data_user;
 
     if (req.user.type_dato === "company") {

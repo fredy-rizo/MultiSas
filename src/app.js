@@ -54,7 +54,7 @@ app.use((req, res, next) => {
 
 // app.use("/api", Token, check_plan_expiration);
 // TODO → General
-app.use("/api/user", Company);
+app.use("/api/company", Company);
 app.use("/api/notes", Notes);
 
 // TODO → Cuenta contable

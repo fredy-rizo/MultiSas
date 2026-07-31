@@ -7,11 +7,11 @@ export default async function (req, res, next) {
       req.socket.remoteAddress ||
       req.ip;
 
-    console.log({
-      ip: req.ip,
-      remoteAddress: req.socket.remoteAddress,
-      xForwardedFor: req.headers["x-forwarded-for"],
-    });
+    // console.log({
+    //   ip: req.ip,
+    //   remoteAddress: req.socket.remoteAddress,
+    //   xForwardedFor: req.headers["x-forwarded-for"],
+    // });
 
     if (ip.startsWith("::ffff:")) {
       ip = ip.replace("::ffff:", "");

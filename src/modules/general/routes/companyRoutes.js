@@ -20,14 +20,14 @@ import { Paginate } from "../../../core/middleware/tools/Pagination.js";
 import { check_plan_expiration } from "../../../core/middleware/lib/Expiration.js";
 const router = Router();
 
-router.post("/register-company", register_company); // Crear empresa (Super Admin)
+router.post("/register", register_company); // Crear empresa (Super Admin)
 
 // router.post("/login-company", check_plan_expiration, login_company); // Iniciar sesion (Admin de empresa)
 
-router.post("/login-company", login_company); // Iniciar sesion (Admin de empresa)
+router.post("/login", login_company); // Iniciar sesion (Admin de empresa)
 
 router.put(
-  "/update-company/:company_id",
+  "/update/:company_id",
   // Token,
   TokenAny,
   TokenAuthorize("Super Admin"),

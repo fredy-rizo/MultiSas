@@ -6,12 +6,17 @@ import {
 import config from "../../../config.js";
 import jwt from "jsonwebtoken";
 // import { modulesByType } from "../../../core/middleware/tools/modules.js";
+// import {
+//   compare_password_user_company,
+//   encrypt_password_user_company,
+//   UserCompany,
+// } from "../../sublimacion/models/U.js";
+import { companyConfig } from "../../../core/middleware/lib/companyConfig.js";
 import {
+  User,
   compare_password_user_company,
   encrypt_password_user_company,
-  UserCompany,
-} from "../../sublimacion/models/UserCompany.js";
-import { companyConfig } from "../../../core/middleware/lib/companyConfig.js";
+} from "../models/User.js";
 
 /**
  * @param {import('express').Request} req
@@ -29,26 +34,20 @@ export const register_company = async (req, res) => {
         status: false,
       });
 
-    // const modules = modulesByType[type_company];
-    // if (!modules)
-    //   return res
-    //     .status(400)
-    //     .json({ msj: "Tipo de empresa invalido", status: false });
-
-    // const config = companyConfig[type_company]
-    // if (!config) return res.status(400).json({ msj: "Tipo de empresa invalido", status: false })
-
-    let counters = {}
-    let role_user = "Super Admin"
+    let counters = {};
+    let role_user = "Super Admin";
 
     if (type_company) {
-      const config = companyConfig[type_company]
+      const config = companyConfig[type_company];
 
-      if (!config) return res.status(400).json({ msj: "Tipo de empresa invalida", status: false })
+      if (!config)
+        return res
+          .status(400)
+          .json({ msj: "Tipo de empresa invalida", status: false });
 
-      counters = config.counters
+      counters = config.counters;
     } else {
-      role_user = "Super Admin"
+      role_user = "Super Admin";
     }
 
     let data_nit_company = await Company.findOne({ nit_company });
@@ -167,26 +166,7 @@ export const login_company = async (req, res) => {
 export const update_data_company = async (req, res) => {
   try {
     const { company_id } = req.params;
-    const {
-      // role_user,
-      // day_available_plans,
-      available_plans,
-      type_available_plans,
-      months_quantity,
-    } = req.body;
-
-    // if (req.user.type_dato === "company") {
-    //   if (req.user.id !== company_id)
-    //     return res
-    //       .status(403)
-    //       .json({ msj: "No puedes actualizar otra empresa", status: false });
-    // }
-
-    // if (req.user.role_user !== "Super Admin")
-    //   return res.status(403).json({
-    //     msj: "No tienes permisos para realizar esta funcion",
-    //     status: false,
-    //   });
+    const { available_plans, type_available_plans, months_quantity } = req.body;
 
     const is_company = req.user.type_dato === "company";
     const is_super_admin = req.user.role === "Super Admin";
@@ -256,25 +236,12 @@ export const create_user_company_by_admin = async (req, res) => {
     const { company_id } = req.params;
     const user_plan = req.user.available_plans;
     const {
-      email_user_company,
-      name_user_company,
-      role_user_company,
-      password_user_company,
+      user_name_company,
+      user_email_company,
+      user_password_company,
+      nit_company_by_user,
+      user_role_company,
     } = req.body;
-
-    // if (req.user.role_user !== "Admin")
-    //   return res.status(403).json({
-    //     msj: "No tienes permisos para realizar esta funcion",
-    //     status: false,
-    //   });
-
-    // if (req.user.type_dato === "company") {
-    //   if (req.user.id !== company_id)
-    //     return res.status(403).json({
-    //       msj: "No puedes acceder a esta funcion 'CTRL'",
-    //       status: false,
-    //     });
-    // }
 
     const is_company = req.user.type_dato === "company";
     const is_super_admin = req.user.role === "Super Admin";
@@ -285,13 +252,13 @@ export const create_user_company_by_admin = async (req, res) => {
         status: false,
       });
 
-    let data_company = await Company.findById(company_id);
+    const data_company = await Company.findById(company_id);
     if (!data_company)
       return res
         .status(404)
         .json({ msj: "Empresa no encontrada", status: false });
 
-    const total_user_company = await UserCompany.findOne({
+    const total_user_company = await User.findOne({
       "company._id": company_id,
     });
 
@@ -302,10 +269,11 @@ export const create_user_company_by_admin = async (req, res) => {
       });
 
     if (
-      !email_user_company ||
-      !name_user_company ||
-      !role_user_company ||
-      !password_user_company
+      !user_name_company ||
+      !user_email_company ||
+      !user_role_company ||
+      !user_password_company ||
+      !nit_company_by_user
     )
       return res.status(403).json({
         msj: "Completa todos los campos para continuar",
@@ -313,49 +281,29 @@ export const create_user_company_by_admin = async (req, res) => {
       });
 
     const password_encypt_user_company = await encrypt_password_user_company(
-      password_user_company,
+      user_password_company,
     );
 
-    const new_user_company = await UserCompany.create({
-      // company: {
-      //   _id: data_company._id,
-      //   name_company: data_company.name_company,
-      //   name_founder: data_company.name_founder,
-      //   nit_company: data_company.nit_company,
-      //   available_plans: data_company.available_plans,
-      //   type_available_plans: data_company.type_available_plans,
-      //   months_quantity: data_company.months_quantity,
-      //   expired_available_plans: data_company.expired_available_plans,
-      // },
-      company: company_id,
-      email_user_company,
-      name_user_company,
-      role_user_company,
-      password_user_company: password_encypt_user_company,
+    const new_user_company = new User({
+      user_name_company,
+      user_email_company,
+      user_role_company,
+      user_password_company: password_encypt_user_company,
       nit_company_by_user: data_company.nit_company,
       active: false,
+      company: {
+        _id: data_company._id,
+        name_company: data_company.name_company,
+        name_founder: data_company.name_founder,
+        nit_company: data_company.nit_company,
+      },
     });
 
-    // await Company.updateOne(
-    //   { _id: data_company._id },
-    //   {
-    //     $push: {
-    //       user_company_sublimacion: {
-    //         _id: new_user_company._id.toString(),
-    //         email_user_company,
-    //         name_user_company,
-    //         role_user_company,
-    //         password_encypt_user_company: password_encypt_user_company,
-    //         active: false,
-    //       },
-    //     },
-    //   },
-    // );
-
+    const data_user_company = await new_user_company.save();
     res.status(200).json({
-      msj: `Perfil de ${role_user_company} creado exitosamente`,
+      msj: `Perfil de ${user_role_company} creado exitosamente para ${data_company.name_company}`,
       status: true,
-      new_user_company,
+      data_user_company,
     });
   } catch (err) {
     console.log(err);
@@ -370,23 +318,14 @@ export const create_user_company_by_admin = async (req, res) => {
 
 export const active_account_by_company = async (req, res) => {
   try {
-    // const {company_id, user_company_id } = req.params;
     const { user_company_id } = req.params;
     const { active } = req.body;
 
-    let data_user_company = await UserCompany.findById(user_company_id);
+    const data_user_company = await User.findById(user_company_id);
     if (!data_user_company)
       return res
         .status(404)
         .json({ msj: "Usuario no encontrado", status: false });
-
-    // if (req.user.type_dato === "company") {
-    //   if (req.user.id !== data_user_company.company)
-    //     return res.status(404).json({
-    //       msj: "No puedes acceder a esta funcion 'CTRL'",
-    //       status: false,
-    //     });
-    // }
 
     const is_company = req.user.type_dato === "company";
     const is_super_admin = req.user.role === "Super Admin";
@@ -401,22 +340,14 @@ export const active_account_by_company = async (req, res) => {
         status: false,
       });
 
-    // const [company_data, user_company_data] = await Promise.all([
-    //   Company.findById(company_id),
-    //   UserCompany.findById(user_company_id)
-    // ])
-
-    // if(!company_data) return res.status(404).json({msj: "Empresa no encontrada", status: false})
-    // if(!user_company_data) return res.status(404).json({msj: "Usuario no encontrado", status: false})
-
-    const result = await UserCompany.updateOne(
+    const result = await User.updateOne(
       { _id: user_company_id },
       { $set: { active } },
     );
 
     res
       .status(200)
-      .json({ msj: "Cuenta activada correctamente", status: true, result });
+      .json({ msj: "Cuenta activada exitosamente", status: true, result });
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
@@ -430,26 +361,15 @@ export const active_account_by_company = async (req, res) => {
 
 export const login_user_by_company = async (req, res) => {
   try {
-    const { nit_company_by_user, password_user_company } = req.body;
+    const { nit_company_by_user, user_password_company } = req.body;
 
-    if (!nit_company_by_user || !password_user_company)
+    if (!nit_company_by_user || !user_password_company)
       return res.status(403).json({
         msj: "Completa todos los campos para iniciar sesion",
         status: true,
       });
 
-    // const data_company = await UserCompany.findOne({
-    // nit_company: nit_company_by_user,
-    // "user_company_sublimacion.email_user_company": email_user_company,
-    //   "company.nit_company": nit_company_by_user,
-    //   email_user_company,
-    // });
-    // if (!data_company)
-    //   return res
-    //     .status(404)
-    //     .json({ msj: "Usuario de empresa no encontrado", status: false });
-
-    const user_company = await UserCompany.findOne({
+    const user_company = await User.findOne({
       "company.nit_company": nit_company_by_user,
     });
     if (!user_company)
@@ -463,8 +383,8 @@ export const login_user_by_company = async (req, res) => {
         .json({ msj: "Empleado inactivo dentro de la empresa", status: false });
 
     const password_validate_user_company = await compare_password_user_company(
-      password_user_company,
-      user_company.password_user_company,
+      user_password_company,
+      user_company.user_password_company,
     );
     if (!password_validate_user_company)
       return res
@@ -474,10 +394,10 @@ export const login_user_by_company = async (req, res) => {
     const token = jwt.sign(
       {
         _id: user_company._id,
-        email_user_company: user_company.email_user_company,
-        name_user_company: user_company.name_user_company,
+        user_name_company: user_company.user_name_company,
+        user_email_company: user_company.user_email_company,
         nit_company_by_user: user_company.nit_company_by_user,
-        role_user_company: user_company.role_user_company,
+        user_role_company: user_company.user_role_company,
         active: user_company.active,
       },
       config.SECRET,
@@ -489,27 +409,17 @@ export const login_user_by_company = async (req, res) => {
       token,
     };
 
-    await UserCompany.updateOne({ _id: user_company._id }, new_user_company);
+    await User.updateOne({ _id: user_company._id }, new_user_company);
     res.status(200).json({
       msj: "Iniciando sesion...",
       status: true,
       token,
       data: {
-        // company: {
-        //   _id: user_company.company._id,
-        //   name_company: user_company.company.name_company,
-        //   name_founder: user_company.company.name_founder,
-        //   nit_company: user_company.company.nit_company,
-        //   available_plans: user_company.company.available_plans,
-        //   type_available_plans: user_company.company.type_available_plans,
-        //   months_quantity: user_company.company.months_quantity,
-        //   expired_available_plans: user_company.company.expired_available_plans,
-        // },
         company: user_company.company,
-        email_user_company: user_company.email_user_company,
-        name_user_company: user_company.name_user_company,
-        role_user_company: user_company.role_user_company,
+        user_name_company: user_company.user_name_company,
+        user_email_company: user_company.user_email_company,
         nit_company_by_user: user_company.nit_company_by_user,
+        user_role_company: user_company.user_role_company,
         active: user_company.active,
       },
     });
@@ -526,15 +436,6 @@ export const login_user_by_company = async (req, res) => {
 
 export const test_plan_axpiration = async (req, res) => {
   try {
-    // const data = {
-    //   status: true,
-    //   day_lef: req.user.day_available_plans,
-    //   user_id: req.user.id,
-    // };
-
-    // console.log("data", data);
-    // return;
-
     return res.json({
       status: true,
       day_lef: req.user.day_available_plans,
@@ -588,14 +489,6 @@ export const list_user_by_company_active = async (req, res) => {
   try {
     const { company_id } = req.params;
 
-    // if (req.user.type_dato === "company") {
-    //   if (req.user.id !== company_id)
-    //     return res.status(403).json({
-    //       msj: "No tienes acceso a esta funcion 'CTRL'",
-    //       status: false,
-    //     });
-    // }
-
     const is_company = req.user.type_dato === "company";
     const is_super_admin = req.user.role === "Super Admin";
 
@@ -616,10 +509,8 @@ export const list_user_by_company_active = async (req, res) => {
       active: true,
     };
 
-    // console.log("filterrrrrr", filter);
-
-    const cant = await UserCompany.find(filter).countDocuments();
-    const data = await UserCompany.find(filter)
+    const cant = await User.find(filter).countDocuments();
+    const data = await User.find(filter)
       .skip(req.body.skippag)
       .limit(req.body.limit)
       .sort({ _id: -1 });
@@ -649,14 +540,6 @@ export const list_user_by_company_not_active = async (req, res) => {
   try {
     const { company_id } = req.params;
 
-    // if (req.user.type_dato === "company") {
-    //   if (req.user.id !== company_id)
-    //     return res.status(403).json({
-    //       msj: "No tienes acceso a esta funcion 'CTRL'",
-    //       status: false,
-    //     });
-    // }
-
     const is_company = req.user.type_dato === "company";
     const is_super_admin = req.user.role === "Super Admin";
 
@@ -675,10 +558,8 @@ export const list_user_by_company_not_active = async (req, res) => {
       active: false,
     };
 
-    // console.log("filterrr", filter);
-
-    const cant = await UserCompany.find(filter).countDocuments();
-    const data = await UserCompany.find(filter)
+    const cant = await User.find(filter).countDocuments();
+    const data = await User.find(filter)
       .skip(req.body.skippag)
       .limit(req.body.limit)
       .sort({ _id: -1 });
@@ -699,7 +580,7 @@ export const list_user_by_company_not_active = async (req, res) => {
   }
 };
 
-// ------------------------
+// ------------------------ No en uso
 export const calcular_nomina = async (req, res) => {
   try {
     const { company_id, nomina_id } = req.params;
