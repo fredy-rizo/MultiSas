@@ -24,7 +24,6 @@ export const create_product = async (req, res) => {
       stock_product,
       minimum_stock_product,
       batch_product,
-      // expiration_date_product,
     } = req.body;
 
     if (
@@ -36,7 +35,6 @@ export const create_product = async (req, res) => {
       !stock_product ||
       !minimum_stock_product ||
       !batch_product
-      // !expiration_date_product
     )
       return res
         .status(403)
@@ -47,10 +45,6 @@ export const create_product = async (req, res) => {
       return res
         .status(404)
         .json({ msj: "Empresa no encontrada", status: false });
-
-    // console.log(batch_product);
-    // console.log(typeof batch_product);
-    // console.log(Array.isArray(batch_product));
 
     const bill_counter_pharmacy = await gobal_bill(
       company_id,
@@ -82,10 +76,6 @@ export const create_product = async (req, res) => {
       };
     });
 
-    // const bill_counter_pharmacy =
-    //   await generate_bill_number_phaymacy(company_id);
-    // const bill_counter_batch = await generate_bill_number_batch(company_id);
-
     const new_product_pharmacy = new Product({
       bill_counter: bill_counter_pharmacy,
       name_product,
@@ -95,9 +85,12 @@ export const create_product = async (req, res) => {
       unit_product,
       stock_product,
       minimum_stock_product,
-      // expiration_date_product,
       batch_product: parsed_batches,
-      company: company_data._id,
+      company: {
+        _id: company_data._id,
+        name_company: company_data.name_company,
+        name_founder: company_data.name_founder,
+      },
     });
 
     const save_product_pharmacy = await new_product_pharmacy.save();
@@ -120,7 +113,6 @@ export const create_product = async (req, res) => {
 export const update_product = async (req, res) => {
   try {
     const { company_id, product_id } = req.params;
-    // console.log("req.params", req.params);
     const {
       name_product,
       category_product,
@@ -129,7 +121,6 @@ export const update_product = async (req, res) => {
       unit_product,
       stock_product,
       minimum_stock_product,
-      // expiration_date_product,
     } = req.body;
 
     const company_data = await Company.findById(company_id);
@@ -139,7 +130,6 @@ export const update_product = async (req, res) => {
         .json({ msj: "Empresa no encontrada", status: false });
 
     const product_data = await Product.findById(product_id);
-    // console.log("product", product_data);
     if (!product_data)
       return res
         .status(404)
@@ -156,7 +146,6 @@ export const update_product = async (req, res) => {
           unit_product,
           stock_product,
           minimum_stock_product,
-          // expiration_date_product,
         },
       },
     );
@@ -192,48 +181,10 @@ export const update_product_batch = async (req, res) => {
         .status(404)
         .json({ msj: "Producto no encontrado", status: false });
 
-    // let parsedDate;
-
-    // if (/^\d{4}-\d{2}-\d{2}$/.test(expiration_date)) {
-    //   const [year, month, day] = expiration_date.split("-");
-    //   parsedDate = new Date(year, month - 1, day);
-    // } else if (/^\d{2}-\d{2}-\d{2}$/.test(expiration_date)) {
-    //   const [year, month, day] = expiration_date.split("/");
-    //   parsedDate = new Date(`20${year}`, month - 1, day);
-    // } else {
-    //   return res.status(400).json({
-    //     msj: `Formato de fecha invalido: ${expiration_date}`,
-    //     status: false,
-    //   });
-    // }
-
-    // if (isNaN(parsedDate)) {
-    //   return res
-    //     .status(400)
-    //     .json({ msj: `Fecha invalida ${expiration_date}`, status: false });
-    // }
-
-    // const product_batch_data = await Product.updateOne(
-    //   {
-    //     _id: product_id,
-    //     "batch_product._id": batch_id,
-    //   },
-    //   {
-    //     $set: {
-    //       "batch_product.$.lote": lote,
-    //       "batch_product.$.expiration_date": parsedDate,
-    //       "batch_product.$.quantity": quantity,
-    //     },
-    //   },
-    // );
-
-    // console.log("OLAAAAAAAAAAAAAAAAAAAAAAAA", product_batch_data);
-    // return;
-
     if (!Array.isArray(batch_product) || batch_product.length === 0)
       return res.status(400).json({ msj: "Lote no ingresado", status: false });
 
-    const parsed_batches = batch_product.map((batch, index) => {
+    batch_product.map((batch, index) => {
       if (!batch.lote || !batch.expiration_date || !batch.quantity)
         throw new Error(`Datos incompletos en lote ${index + 1}`);
 
@@ -288,7 +239,7 @@ export const list_products_stocks_minimum = async (req, res) => {
         .json({ msj: "Empresa no encontrada", status: false });
 
     const filter = {
-      company: company_id,
+      "company._id": company_data._id,
       $expr: {
         $lte: [
           { $toDouble: "$stock_product" },
@@ -296,6 +247,7 @@ export const list_products_stocks_minimum = async (req, res) => {
         ],
       },
     };
+
     const cant = await Product.countDocuments(filter);
     const data = await Product.find(filter)
       .skip(req.body.skippag)
@@ -335,7 +287,7 @@ export const list_product_lotes = async (req, res) => {
 
     const today = new Date();
     const filter = {
-      company: company_id,
+      "company._id": company_data._id,
       batch_product: {
         $elemMatch: {
           expiration_date: { $lt: today },
@@ -344,7 +296,6 @@ export const list_product_lotes = async (req, res) => {
     };
 
     const cant = await Product.countDocuments(filter);
-
     const data = await Product.find(filter)
       .skip(req.body.skippag)
       .limit(req.body.limit)
@@ -381,7 +332,7 @@ export const list_products = async (req, res) => {
         .status(404)
         .json({ msj: "Empresa no encontrada", status: false });
 
-    const filter = { company: company_id };
+    const filter = { "company._id": company_data._id };
     const cant = await Product.countDocuments(filter);
 
     const data = await Product.find(filter)

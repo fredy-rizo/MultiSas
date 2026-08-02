@@ -4,6 +4,8 @@ import { Company } from "../../../modules/general/models/Company.js";
 // import { UserCompany } from "../../../modules/sublimacion/models/UserCompany.js";
 import { User } from "../../../modules/general/models/User.js";
 import plan from "../json/plan.json" with { type: "json" };
+import { Permissions } from "../../../modules/general/models/Permissions.js";
+import mongoose, { mongo } from "mongoose";
 
 export const Token = async (req, res, next) => {
   const authHeader = req.headers["token-access"];
@@ -86,19 +88,13 @@ export const TokenUserCompany = async (req, res, next) => {
 
 export const TokenAny = async (req, res, next) => {
   const authHeader = req.headers["token-access"];
-  // console.log("authHeaderrrr", authHeader);
   const token = authHeader?.split(" ")[1];
-  // console.log("token desde tokenAny middleware", token);
-  // return;
   if (!token)
     return res.status(401).json({ msj: "Sin autorizacionS", status: false });
-
   try {
     const decoded = jwt.verify(token, config.SECRET);
-    // console.log("decoded tokenany", decoded);
 
-    let company = await Company.findById(decoded._id);
-    // console.log("company en token", company._id);
+    const company = await Company.findById(decoded._id);
     if (company) {
       req.user = {
         id: company.id,
@@ -111,12 +107,12 @@ export const TokenAny = async (req, res, next) => {
       return next();
     }
 
-    let user_company = await User.findById(decoded._id);
+    const user_company = await User.findById(decoded._id);
     if (user_company) {
       req.user = {
         id: user_company.id,
         type_dato: "user_company",
-        role: user_company.role_user_company,
+        role: user_company.user_role_company,
         active: user_company.active,
         data: user_company,
       };
@@ -133,42 +129,83 @@ export const TokenAny = async (req, res, next) => {
 
 export const TokenAuthorize = (...roles) => {
   return async (req, res, next) => {
-    // console.log("req.user", req.user);
-    // console.log("roles", req.user.roles);
-    let data_user;
+    try {
+      if (req.user.type_dato === "company") {
+        const company = await Company.findById(req.user.id);
 
-    if (req.user.type_dato === "company") {
-      data_user = await Company.findById(req.user.id);
+        if (!company)
+          return res
+            .status(404)
+            .json({ msj: "Empresa no encontrada", status: false });
 
-      if (!data_user)
-        return res
-          .status(404)
-          .json({ msj: "Empresa no encontrada", status: false });
+        if (!company.active_account)
+          return res
+            .status(403)
+            .json({ msj: "Empresa inactiva", status: false });
 
-      if (!roles.includes(data_user.role_user))
+        if (!roles.includes(company.role_user))
+          return res
+            .status(403)
+            .json({ msj: "No tienes permisos", status: false });
+
+        return next();
+      }
+
+      if (req.user.type_dato === "user_company") {
+        const user = await User.findById(req.user.id);
+
+        if (!user)
+          return res
+            .status(404)
+            .json({ msj: "Usuario de empresa no encontrado", status: false });
+
+        if (!user.active)
+          return res
+            .status(403)
+            .json({ msj: "Usuario inactivo", status: false });
+
+        return next();
+      }
+
+      return res
+        .status(403)
+        .json({ msj: "Tipo de usuario no valido", status: false });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ msj: "Error al validar autorizacion", status: false, err });
+    }
+  };
+};
+
+export const TokenPermission = (permissions) => {
+  return async (req, res, next) => {
+    try {
+      if (req.user.role === "Super Admin") return next();
+
+      if (req.user.type_dato === "company") return next();
+
+      const permission_user = await Permissions.findOne({
+        "company._id": new mongoose.Types.ObjectId(req.params.company_id),
+        "user._id": new mongoose.Types.ObjectId(req.user.id),
+      });
+
+      if (!permission_user)
         return res
           .status(403)
           .json({ msj: "No tienes permisos", status: false });
-    }
 
-    if (req.user.type_dato === "user_company") {
-      data_user = await UserCompany.findById(req.user.id);
-
-      if (!data_user)
-        return res
-          .status(404)
-          .json({ msj: "Usuario de empresa no encontrado", status: false });
-
-      if (!data_user.active)
-        return res.status(403).json({ msj: "Usuario inactivo", status: false });
-
-      if (!roles.includes(data_user.role_user_company))
+      if (!permission_user.permissions.includes(permissions))
         return res
           .status(403)
           .json({ msj: "No tienes permisos", status: false });
-    }
 
-    next();
+      next();
+    } catch (err) {
+      res
+        .status(500)
+        .json({ msj: "Error al validar permisos", status: false, err });
+    }
   };
 };
 

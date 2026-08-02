@@ -10,6 +10,7 @@ import ip_query_middleware from "./core/middleware/lib/ip_query_middleware.js";
 // TODO → General
 import Company from "./modules/general/routes/companyRoutes.js";
 import Notes from "./modules/general/routes/notesRoutes.js";
+import Permissions from "./modules/general/routes/permissionsRoutes.js";
 
 // TODO → Cuenta contable
 import AccountPlan from "./modules/cuenta_contable/routes/accountPlanRoutes.js";
@@ -56,6 +57,7 @@ app.use((req, res, next) => {
 // TODO → General
 app.use("/api/company", Company);
 app.use("/api/notes", Notes);
+app.use("/api/permission", Permissions);
 
 // TODO → Cuenta contable
 app.use("/api/account_plan", AccountPlan);

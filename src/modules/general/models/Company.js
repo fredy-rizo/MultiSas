@@ -40,7 +40,7 @@ const companySchema = new Schema(
     counters: {
       type: Map,
       of: Number,
-      default: {}
+      default: {},
     },
     // bill_counter: { type: Number, default: 0 },
     // bill_counter_brief_case: { type: Number, default: 0 },
@@ -183,5 +183,3 @@ export const Company = mongoose.model("company", companySchema);
     bill_counter_sale_pharmacy → Contador para enumerar ventas en farmacia
 
 */
-
-
