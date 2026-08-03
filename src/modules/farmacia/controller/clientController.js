@@ -34,7 +34,9 @@ export const create_client = async (req, res) => {
       nit_client,
       type_client,
       address_client,
-      company_id: company_data._id,
+      company: {
+        _id: company_data._id,
+      },
     });
 
     const save_client = await new_client.save();
@@ -138,7 +140,9 @@ export const delete_client = async (req, res) => {
 
     const company_client_data = await Client.findOne({
       _id: client_id,
-      company_id: company_id,
+      company: {
+        _id: company_data._id,
+      },
     });
     if (!company_client_data)
       return res

@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   TokenAny,
   TokenAuthorize,
+  TokenPermission,
 } from "../../../core/middleware/tools/Token.js";
 import { Paginate } from "../../../core/middleware/tools/Pagination.js";
 import {
@@ -16,10 +17,11 @@ router.post(
   "/:company_id",
   TokenAny,
   TokenAuthorize("Admin", "Super Admin"),
+  TokenPermission("clients.create"),
   create_client,
 ); // Crear cliente en farmacia (no obligatorio)
 
-router.patch(
+router.put(
   "/:company_id/updating/:client_id",
   TokenAny,
   TokenAuthorize("Admin", "Super Admin"),

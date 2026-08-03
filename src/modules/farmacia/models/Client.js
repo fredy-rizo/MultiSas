@@ -13,7 +13,12 @@ const clientSchema = new Schema(
       default: "--------------",
     },
     address_client: { type: String, default: "--------------" },
-    company_id: String,
+    company: {
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        immutable: true,
+      },
+    },
   },
   { timestamps: true },
 );
